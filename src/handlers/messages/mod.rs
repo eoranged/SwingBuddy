@@ -2,7 +2,7 @@
 //! 
 //! Handles incoming text messages, new member events, and CAS API checking
 
-use teloxide::{Bot, types::{Message, ChatMemberUpdated, User}, prelude::*};
+use teloxide::{Bot, types::Message, prelude::*};
 use tracing::{info, debug, warn, error};
 use crate::utils::errors::Result;
 use crate::services::ServiceFactory;

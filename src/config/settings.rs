@@ -4,7 +4,6 @@
 //! for loading settings from TOML files and environment variables.
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// Main application configuration structure
 #[derive(Debug, Clone, Deserialize, Serialize)]

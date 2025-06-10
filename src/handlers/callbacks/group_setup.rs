@@ -4,7 +4,7 @@
 
 use std::collections::HashMap;
 use teloxide::{Bot, types::{ChatId, InlineKeyboardMarkup, InlineKeyboardButton, ChatMemberStatus}, prelude::*};
-use tracing::{info, debug, warn, error};
+use tracing::{info, debug, warn};
 use crate::utils::errors::Result;
 use crate::services::ServiceFactory;
 use crate::i18n::I18n;

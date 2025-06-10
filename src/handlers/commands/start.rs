@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use teloxide::{Bot, types::{Message, InlineKeyboardMarkup, InlineKeyboardButton, ChatId}, prelude::*};
 use tracing::{info, debug, warn, error};
 use crate::utils::errors::Result;
-use crate::services::{UserService, ServiceFactory};
+use crate::services::ServiceFactory;
 use crate::state::{ScenarioManager, StateStorage, ConversationContext};
 use crate::i18n::I18n;
 use crate::models::user::CreateUserRequest;

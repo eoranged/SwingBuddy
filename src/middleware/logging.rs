@@ -7,7 +7,6 @@ use std::time::Instant;
 use teloxide::types::{Message, Update, User};
 use tracing::{info, debug, warn, error, Span, instrument};
 use serde_json::json;
-use crate::utils::errors::Result;
 
 /// Logging middleware for bot interactions
 #[derive(Clone)]

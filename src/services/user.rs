@@ -4,7 +4,7 @@
 //! location management, and user onboarding flow logic.
 
 use std::collections::HashMap;
-use tracing::{info, warn, error, debug};
+use tracing::{info, warn, debug};
 use crate::config::settings::Settings;
 use crate::database::repositories::UserRepository;
 use crate::models::user::{User, CreateUserRequest, UpdateUserRequest};

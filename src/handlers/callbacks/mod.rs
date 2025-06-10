@@ -5,7 +5,7 @@
 pub mod group_setup;
 
 use teloxide::{Bot, types::{CallbackQuery, ChatId}, prelude::*};
-use tracing::{info, debug, warn, error};
+use tracing::{info, warn, error};
 use crate::utils::errors::Result;
 use crate::services::ServiceFactory;
 use crate::state::{ScenarioManager, StateStorage};

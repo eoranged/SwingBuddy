@@ -4,10 +4,10 @@
 //! including serialization, deserialization, expiration, and cleanup.
 
 use std::time::Duration;
-use redis::{AsyncCommands, RedisResult};
+use redis::AsyncCommands;
 use serde_json;
 use tracing::{debug, warn, error, info};
-use crate::utils::errors::{SwingBuddyError, Result};
+use crate::utils::errors::Result;
 use crate::config::RedisConfig;
 use super::context::ConversationContext;
 

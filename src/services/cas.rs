@@ -7,7 +7,7 @@
 use std::time::Duration;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn, error, debug};
+use tracing::{info, warn, debug};
 use redis::AsyncCommands;
 use crate::config::settings::Settings;
 use crate::utils::errors::{SwingBuddyError, CasError, Result};

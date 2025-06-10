@@ -1,6 +1,6 @@
 //! Database connection management
 
-use sqlx::{PgPool, Pool, Postgres};
+use sqlx::{Pool, Postgres};
 use std::time::Duration;
 use crate::utils::errors::SwingBuddyError;
 

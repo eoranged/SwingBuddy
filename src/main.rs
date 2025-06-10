@@ -122,9 +122,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting bot with polling mode...");
     
     // Configure allowed update types to include callback queries
-    use teloxide::types::AllowedUpdate;
-    use teloxide::requests::Requester;
-    use url::Url;
+    
+    
+    
     
     
     dispatcher.dispatch().await;

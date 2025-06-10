@@ -4,10 +4,9 @@
 //! user state caching for conversation flows, cache invalidation strategies,
 //! and performance optimization for database queries.
 
-use std::time::Duration;
 use redis::{Client, AsyncCommands, RedisResult};
 use serde::{Serialize, Deserialize};
-use tracing::{info, warn, error, debug};
+use tracing::{info, warn, debug};
 use crate::config::settings::Settings;
 use crate::utils::errors::{SwingBuddyError, Result};
 

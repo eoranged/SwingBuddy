@@ -4,10 +4,9 @@ use std::collections::HashMap;
 use teloxide::{Bot, types::{Message, InlineKeyboardMarkup, InlineKeyboardButton, ChatId}, prelude::*};
 use tracing::{info, debug, warn};
 use crate::utils::errors::Result;
-use crate::services::{ServiceFactory, AuthService};
+use crate::services::ServiceFactory;
 use crate::state::{ScenarioManager, StateStorage, ConversationContext};
 use crate::i18n::I18n;
-use crate::models::event::CreateEventRequest;
 
 /// Handle /admin command - show admin panel
 pub async fn handle_admin_panel(

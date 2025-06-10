@@ -4,10 +4,9 @@
 //! management, calendar sharing functionality, OAuth2 authentication,
 //! and event URL generation for "Add to Calendar" functionality.
 
-use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn, error, debug};
+use tracing::{info, debug};
 use crate::config::settings::Settings;
 use crate::models::event::Event;
 use crate::utils::errors::{SwingBuddyError, GoogleError, GoogleResult, Result};

@@ -18,7 +18,7 @@ pub use redis::{RedisService, CacheEntry, CacheStats as RedisCacheStats};
 pub use user::UserService;
 
 use crate::config::settings::Settings;
-use crate::database::repositories::{UserRepository, EventRepository, GroupRepository, AdminRepository};
+use crate::database::repositories::UserRepository;
 use crate::utils::errors::Result;
 use teloxide::Bot;
 

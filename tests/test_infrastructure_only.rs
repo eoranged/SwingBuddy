@@ -4,7 +4,6 @@
 //! without any complex dependencies.
 
 use serde_json::{json, Value};
-use std::collections::HashMap;
 use wiremock::{
     matchers::{method, path},
     Mock, MockServer, ResponseTemplate,

@@ -5,9 +5,9 @@
 //! and integration with admin configuration from TOML.
 
 use std::collections::HashSet;
-use teloxide::types::{ChatId, ChatMember, ChatMemberKind, UserId};
+use teloxide::types::{ChatId, ChatMemberKind, UserId};
 use teloxide::{Bot, requests::Requester, prelude::Request};
-use tracing::{info, warn, error, debug};
+use tracing::{info, warn, debug};
 use crate::config::settings::Settings;
 use crate::models::User;
 use crate::utils::errors::{SwingBuddyError, Result};

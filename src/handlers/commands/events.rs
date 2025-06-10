@@ -2,13 +2,11 @@
 
 use std::collections::HashMap;
 use teloxide::{Bot, types::{Message, InlineKeyboardMarkup, InlineKeyboardButton, ChatId}, prelude::*};
-use tracing::{info, debug, warn};
-use chrono::{DateTime, Utc};
+use tracing::{info, debug};
 use crate::utils::errors::Result;
-use crate::services::{ServiceFactory, GoogleCalendarService};
-use crate::database::repositories::EventRepository;
+use crate::services::ServiceFactory;
 use crate::i18n::I18n;
-use crate::models::event::{Event, CreateEventRequest};
+use crate::models::event::Event;
 
 /// Handle /events command - list upcoming events in private chats
 pub async fn handle_events_list(
