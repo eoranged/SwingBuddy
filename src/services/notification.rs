@@ -54,6 +54,7 @@ pub struct NotificationStats {
 
 /// Notification service for message handling
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct NotificationService {
     bot: Bot,
     settings: Settings,

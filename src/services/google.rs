@@ -45,6 +45,7 @@ pub struct GoogleAttendee {
 
 /// Google Calendar service for event management
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct GoogleCalendarService {
     settings: Settings,
     http_client: reqwest::Client,

@@ -6,6 +6,7 @@ use crate::models::user::{User, CreateUserRequest, UpdateUserRequest};
 use crate::utils::errors::SwingBuddyError;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct UserRepository {
     pool: PgPool,
 }

@@ -38,10 +38,10 @@ async fn test_language_selection_callback_onboarding() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed: {:?}", result);
@@ -52,10 +52,10 @@ async fn test_language_selection_callback_onboarding() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Language selection callback should succeed: {:?}", result);
@@ -135,10 +135,10 @@ async fn test_russian_language_selection_callback() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Test Russian language selection
@@ -147,10 +147,10 @@ async fn test_russian_language_selection_callback() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Russian language selection should succeed: {:?}", result);
@@ -222,10 +222,10 @@ async fn test_invalid_language_callback() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Test invalid language codes
@@ -241,10 +241,10 @@ async fn test_invalid_language_callback() {
         let result = handle_callback_query(
             bot.clone(),
             lang_callback,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // Should handle invalid language gracefully
@@ -295,10 +295,10 @@ async fn test_language_callback_no_context() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // Should handle gracefully (might return error or ignore)
@@ -349,10 +349,10 @@ async fn test_language_callback_wrong_step() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // Should handle gracefully and not change the step
@@ -396,10 +396,10 @@ async fn test_concurrent_language_callbacks() {
         start::handle_start(
             bot.clone(),
             start_message,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await.expect("Start should succeed");
     }
     
@@ -413,26 +413,26 @@ async fn test_concurrent_language_callbacks() {
         handle_callback_query(
             bot.clone(),
             lang_callback1,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         handle_callback_query(
             bot.clone(),
             lang_callback2,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         handle_callback_query(
             bot.clone(),
             lang_callback3,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     
@@ -559,10 +559,10 @@ async fn test_malformed_language_callback_data() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Test malformed callback data
@@ -580,10 +580,10 @@ async fn test_malformed_language_callback_data() {
         let result = handle_callback_query(
             bot.clone(),
             callback,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // Should handle malformed data gracefully

@@ -15,7 +15,7 @@ pub use test_context::*;
 pub use simple_test::*;
 pub use test_data::*;
 
-pub type DbUser = crate::models::user::User;
+pub type DbUser = SwingBuddy::models::user::User;
 
 // Re-export commonly used types for convenience
 pub mod fixtures;

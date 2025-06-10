@@ -7,6 +7,6 @@ pub mod scenarios;
 pub mod storage;
 
 // Re-export commonly used state components
-pub use context::ConversationContext;
+pub use context::{AppContext, ConversationContext};
 pub use scenarios::{Scenario, ScenarioManager, ScenarioStep, StepValidation, InputType};
 pub use storage::{StateStorage, StateStorageManager, StorageStats, ConnectionInfo};

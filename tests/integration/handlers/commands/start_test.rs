@@ -40,10 +40,10 @@ async fn test_start_command_new_user_private_chat() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed: {:?}", result);
@@ -58,11 +58,11 @@ async fn test_start_command_new_user_private_chat() {
             username as "username?",
             first_name as "first_name?",
             last_name as "last_name?",
-            language_code,
+            COALESCE(language_code, 'en') as language_code,
             location as "location?",
-            is_banned,
-            created_at,
-            updated_at
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -122,10 +122,10 @@ async fn test_start_command_group_chat() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should handle group chat gracefully: {:?}", result);
@@ -197,10 +197,10 @@ async fn test_start_command_existing_user() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed for existing user: {:?}", result);
@@ -224,11 +224,11 @@ async fn test_start_command_existing_user() {
             username as "username?",
             first_name as "first_name?",
             last_name as "last_name?",
-            language_code,
+            COALESCE(language_code, 'en') as language_code,
             location as "location?",
-            is_banned,
-            created_at,
-            updated_at
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -269,10 +269,10 @@ async fn test_start_command_with_deep_linking() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command with deep linking should succeed: {:?}", result);
@@ -287,11 +287,11 @@ async fn test_start_command_with_deep_linking() {
             username as "username?",
             first_name as "first_name?",
             last_name as "last_name?",
-            language_code,
+            COALESCE(language_code, 'en') as language_code,
             location as "location?",
-            is_banned,
-            created_at,
-            updated_at
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -343,10 +343,10 @@ async fn test_start_command_no_user_error() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // The handler should succeed because we have a valid user in our test message
@@ -419,10 +419,10 @@ async fn test_start_command_different_languages() {
     let result = start::handle_start(
         bot.clone(),
         start_message_ru,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed for Russian user: {:?}", result);
@@ -437,11 +437,11 @@ async fn test_start_command_different_languages() {
             username as "username?",
             first_name as "first_name?",
             last_name as "last_name?",
-            language_code,
+            COALESCE(language_code, 'en') as language_code,
             location as "location?",
-            is_banned,
-            created_at,
-            updated_at
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id_ru
@@ -488,26 +488,26 @@ async fn test_concurrent_start_commands() {
         start::handle_start(
             bot.clone(),
             start_message1,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         start::handle_start(
             bot.clone(),
             start_message2,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         start::handle_start(
             bot.clone(),
             start_message3,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     

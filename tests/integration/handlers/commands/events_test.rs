@@ -45,8 +45,8 @@ async fn test_events_command_private_chat() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Events command should succeed: {:?}", result);
@@ -90,8 +90,8 @@ async fn test_events_command_group_chat() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Events command should handle group chat gracefully: {:?}", result);
@@ -142,8 +142,8 @@ async fn test_events_command_different_languages() {
     let result_en = events::handle_events_list(
         bot.clone(),
         events_message_en,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result_en.is_ok(), "Events command should succeed for English user: {:?}", result_en);
@@ -171,8 +171,8 @@ async fn test_events_command_different_languages() {
     let result_ru = events::handle_events_list(
         bot.clone(),
         events_message_ru,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result_ru.is_ok(), "Events command should succeed for Russian user: {:?}", result_ru);
@@ -209,8 +209,8 @@ async fn test_events_command_non_existent_user() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Events command should succeed for non-existent user: {:?}", result);
@@ -261,8 +261,8 @@ async fn test_calendar_selection_callbacks() {
             chat_id,
             user_id,
             calendar_type.to_string(),
-            app_state.services.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         assert!(result.is_ok(), "Calendar callback should succeed for {}: {:?}", calendar_type, result);
@@ -307,8 +307,8 @@ async fn test_event_registration_flow() {
     let result = events::handle_register(
         bot.clone(),
         register_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Register command should succeed: {:?}", result);
@@ -322,8 +322,8 @@ async fn test_event_registration_flow() {
         chat_id_obj,
         user_id,
         event_id,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Event registration callback should succeed: {:?}", result);
@@ -334,8 +334,8 @@ async fn test_event_registration_flow() {
         chat_id_obj,
         user_id,
         event_id,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Event unregistration callback should succeed: {:?}", result);
@@ -379,8 +379,8 @@ async fn test_event_creation_admin() {
     let result = events::handle_create_event(
         bot.clone(),
         create_event_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Create event command should succeed for admin: {:?}", result);
@@ -424,8 +424,8 @@ async fn test_event_creation_non_admin() {
     let result = events::handle_create_event(
         bot.clone(),
         create_event_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Create event command should handle non-admin gracefully: {:?}", result);
@@ -476,20 +476,20 @@ async fn test_concurrent_events_commands() {
         events::handle_events_list(
             bot.clone(),
             events_message1,
-            app_state.services.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.i18n).clone(),
         ),
         events::handle_events_list(
             bot.clone(),
             events_message2,
-            app_state.services.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.i18n).clone(),
         ),
         events::handle_events_list(
             bot.clone(),
             events_message3,
-            app_state.services.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     
@@ -538,8 +538,8 @@ async fn test_events_command_error_handling() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // The command should fail due to API error

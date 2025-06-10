@@ -4,9 +4,108 @@
 //! steps, and associated data for each user's interaction with the bot.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc, Duration};
+
+use crate::Settings;
+use crate::ServiceFactory;
 use crate::utils::errors::{SwingBuddyError, Result};
+use crate::{
+    DatabaseService,
+    services::{
+        RedisService,
+        AuthService,
+        NotificationService,
+        CasService,
+        GoogleCalendarService
+    },
+    i18n::I18n,
+    state::scenarios::ScenarioManager,
+    state::storage::StateStorage
+};
+
+/// Application-wide context containing services and settings
+#[derive(Debug, Clone)]
+pub struct AppContext {
+    pub settings: Settings,
+    pub database: Arc<DatabaseService>,
+    pub redis: Option<Arc<RedisService>>,
+    pub user_service: Arc<crate::services::user::UserService>,
+    pub auth_service: Arc<AuthService>,
+    pub notification_service: Arc<NotificationService>,
+    pub cas_service: Arc<CasService>,
+    pub google_service: Option<Arc<GoogleCalendarService>>,
+    pub scenario_manager: Arc<crate::state::scenarios::ScenarioManager>,
+    pub state_storage: Arc<crate::state::storage::StateStorage>,
+    pub services: Arc<ServiceFactory>,
+    pub i18n: Arc<crate::i18n::I18n>,
+}
+
+impl AppContext {
+    /// Create a new AppContext from services
+    pub fn new(
+        settings: Settings,
+        database: Arc<DatabaseService>,
+        redis: Option<Arc<RedisService>>,
+        user_service: Arc<crate::services::user::UserService>,
+        auth_service: Arc<AuthService>,
+        notification_service: Arc<NotificationService>,
+        cas_service: Arc<CasService>,
+        google_service: Option<Arc<GoogleCalendarService>>,
+        scenario_manager: Arc<ScenarioManager>,
+        state_storage: Arc<StateStorage>,
+        services: Arc<ServiceFactory>,
+        i18n: Arc<I18n>,
+    ) -> Self {
+        Self {
+            settings,
+            database,
+            redis,
+            user_service,
+            auth_service,
+            notification_service,
+            cas_service,
+            google_service,
+            scenario_manager,
+            state_storage,
+            services,
+            i18n,
+        }
+    }
+
+    /// Create from ServiceFactory and DatabaseService
+    pub async fn from_factory(factory: ServiceFactory, database: Arc<DatabaseService>, settings: Settings) -> Result<Self> {
+        // Create scenario manager
+        let scenario_manager = Arc::new(ScenarioManager::new());
+        
+        // Create state storage from settings (async)
+        let state_storage = Arc::new(StateStorage::new(settings.redis.clone()).await?);
+        
+        // Create I18n from settings and load translations
+        let mut i18n_loader = crate::i18n::I18n::new(&settings.i18n);
+        i18n_loader.load_translations().await?;
+        let i18n = Arc::new(i18n_loader);
+        
+        // Create services Arc
+        let services = Arc::new(factory.clone());
+        
+        Ok(Self {
+            redis: Some(Arc::new(factory.redis_service.clone())),
+            user_service: Arc::new(factory.user_service.clone()),
+            auth_service: Arc::new(factory.auth_service.clone()),
+            notification_service: Arc::new(factory.notification_service.clone()),
+            cas_service: Arc::new(factory.cas_service.clone()),
+            google_service: Some(Arc::new(factory.google_service.clone())),
+            scenario_manager,
+            state_storage,
+            services,
+            i18n,
+            settings,
+            database,
+        })
+    }
+}
 
 /// User conversation context
 #[derive(Debug, Clone, Serialize, Deserialize)]

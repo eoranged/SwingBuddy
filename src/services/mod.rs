@@ -23,7 +23,7 @@ use crate::utils::errors::Result;
 use teloxide::Bot;
 
 /// Service factory for creating and managing all services
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ServiceFactory {
     pub user_service: UserService,
     pub auth_service: AuthService,

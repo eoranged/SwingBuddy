@@ -46,10 +46,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Start command should succeed: {:?}", result);
     
@@ -58,10 +58,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Language selection should succeed: {:?}", result);
     
@@ -70,10 +70,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Name input should succeed: {:?}", result);
     
@@ -82,10 +82,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Location selection should succeed: {:?}", result);
     
@@ -128,8 +128,8 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Events command should succeed: {:?}", result);
     
@@ -138,10 +138,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = handle_callback_query(
         bot.clone(),
         calendar_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Calendar selection should succeed: {:?}", result);
     
@@ -150,10 +150,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = handle_callback_query(
         bot.clone(),
         back_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Back navigation should succeed: {:?}", result);
     
@@ -162,10 +162,10 @@ async fn test_complete_user_journey_onboarding_to_events() {
     let result = handle_callback_query(
         bot.clone(),
         workshop_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Workshop calendar selection should succeed: {:?}", result);
     
@@ -214,8 +214,8 @@ async fn test_user_journey_with_location_skip() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Events command should succeed after onboarding: {:?}", result);
     
@@ -302,10 +302,10 @@ async fn test_user_journey_with_interruptions() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Select language
@@ -313,10 +313,10 @@ async fn test_user_journey_with_interruptions() {
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     // === INTERRUPTION: User tries other commands during onboarding ===
@@ -331,8 +331,8 @@ async fn test_user_journey_with_interruptions() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Events should handle onboarding state gracefully: {:?}", result);
     
@@ -351,10 +351,10 @@ async fn test_user_journey_with_interruptions() {
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Complete with location
@@ -362,10 +362,10 @@ async fn test_user_journey_with_interruptions() {
     handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Location selection should succeed");
     
     // Verify successful completion
@@ -403,10 +403,10 @@ async fn test_user_journey_with_invalid_inputs() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Try invalid language first
@@ -414,10 +414,10 @@ async fn test_user_journey_with_invalid_inputs() {
     let result = handle_callback_query(
         bot.clone(),
         invalid_lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Invalid language should be handled gracefully: {:?}", result);
     
@@ -432,10 +432,10 @@ async fn test_user_journey_with_invalid_inputs() {
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Valid language selection should succeed");
     
     // Try invalid names
@@ -445,10 +445,10 @@ async fn test_user_journey_with_invalid_inputs() {
         let result = start::handle_name_input(
             bot.clone(),
             name_message,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // Should handle invalid names gracefully
@@ -466,10 +466,10 @@ async fn test_user_journey_with_invalid_inputs() {
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Valid name should succeed");
     
     // Complete with location
@@ -477,10 +477,10 @@ async fn test_user_journey_with_invalid_inputs() {
     handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Location selection should succeed");
     
     // Verify successful completion despite invalid inputs
@@ -519,8 +519,8 @@ async fn test_admin_user_journey() {
     let result = events::handle_create_event(
         bot.clone(),
         create_event_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Admin should be able to create events: {:?}", result);
     
@@ -529,8 +529,8 @@ async fn test_admin_user_journey() {
     let result = events::handle_events_list(
         bot.clone(),
         events_message,
-        app_state.services.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     assert!(result.is_ok(), "Admin should be able to list events: {:?}", result);
     

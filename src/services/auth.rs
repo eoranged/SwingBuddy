@@ -40,6 +40,7 @@ pub struct AuthContext {
 
 /// Authentication service for managing permissions and access control
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct AuthService {
     bot: Bot,
     settings: Settings,

@@ -86,10 +86,10 @@ pub async fn run_complete_user_journey(
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await?;
     
     // Step 2: Select language
@@ -97,10 +97,10 @@ pub async fn run_complete_user_journey(
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await?;
     
     // Step 3: Provide name
@@ -108,10 +108,10 @@ pub async fn run_complete_user_journey(
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await?;
     
     // Step 4: Select location or skip
@@ -125,10 +125,10 @@ pub async fn run_complete_user_journey(
     handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await?;
     
     Ok(())

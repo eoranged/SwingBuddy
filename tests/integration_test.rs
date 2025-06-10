@@ -92,12 +92,12 @@ async fn test_custom_context_config() {
 }
 
 // Test using the helper macros
-test_with_context!(test_macro_usage, async |ctx: &TestContext| {
+test_with_context!(test_macro_usage, async |ctx: &TestContext| -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // Test that the macro works correctly
     let user_count = ctx.database.count_records("users").await?;
     assert!(user_count > 0); // Fixtures should be loaded
     
-    Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+    Ok(())
 });
 
 test_with_custom_context!(
@@ -108,8 +108,8 @@ test_with_custom_context!(
         setup_default_mocks: true,
         bot_token: Some("macro_test_token".to_string()),
     }),
-    async |ctx: &TestContext| {
+    async |ctx: &TestContext| -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         assert_eq!(ctx.bot_token, "macro_test_token");
-        Ok::<(), Box<dyn std::error::Error + Send + Sync>>(())
+        Ok(())
     }
 );

@@ -114,10 +114,10 @@ async fn test_complete_happy_path_onboarding_flow() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed: {:?}", result);
@@ -136,10 +136,10 @@ async fn test_complete_happy_path_onboarding_flow() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Language selection should succeed: {:?}", result);
@@ -158,10 +158,10 @@ async fn test_complete_happy_path_onboarding_flow() {
     let result = start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Name input should succeed: {:?}", result);
@@ -180,10 +180,10 @@ async fn test_complete_happy_path_onboarding_flow() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Location selection should succeed: {:?}", result);
@@ -224,30 +224,30 @@ async fn test_onboarding_with_location_skip() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:ru");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     let name_message = create_simple_test_message(user_id, chat_id, "Иван Петров");
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // User skips location
@@ -256,10 +256,10 @@ async fn test_onboarding_with_location_skip() {
     let result = handle_callback_query(
         bot.clone(),
         skip_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Location skip should succeed: {:?}", result);
@@ -299,20 +299,20 @@ async fn test_invalid_name_input_handling() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:en");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     // Test invalid name inputs
@@ -329,10 +329,10 @@ async fn test_invalid_name_input_handling() {
         let result = start::handle_name_input(
             bot.clone(),
             name_message,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // The handler should not fail but should stay in the same step
@@ -348,10 +348,10 @@ async fn test_invalid_name_input_handling() {
     let result = start::handle_name_input(
         bot.clone(),
         valid_name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Valid name should succeed: {:?}", result);
@@ -387,10 +387,10 @@ async fn test_conversation_state_management() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Verify initial state
@@ -406,10 +406,10 @@ async fn test_conversation_state_management() {
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     // Verify state updated and data persisted
@@ -476,10 +476,10 @@ async fn test_existing_user_handling() {
     let result = start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Start command should succeed for existing user: {:?}", result);
@@ -531,10 +531,10 @@ async fn test_state_expiry_handling() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Manually expire the context
@@ -557,10 +557,10 @@ async fn test_state_expiry_handling() {
     let result = handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // The system should handle expired state gracefully
@@ -597,18 +597,18 @@ async fn test_concurrent_onboarding_sessions() {
         start::handle_start(
             bot.clone(),
             start_message1,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         start::handle_start(
             bot.clone(),
             start_message2,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     
@@ -630,18 +630,18 @@ async fn test_concurrent_onboarding_sessions() {
         handle_callback_query(
             bot.clone(),
             lang_callback1,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         handle_callback_query(
             bot.clone(),
             lang_callback2,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     

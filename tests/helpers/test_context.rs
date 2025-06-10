@@ -167,58 +167,60 @@ impl TestContext {
     pub async fn create_app_state(&self) -> Result<Arc<SwingBuddy::state::context::AppContext>, Box<dyn std::error::Error + Send + Sync>> {
         let database_service = Arc::new(SwingBuddy::database::service::DatabaseService::new(self.db_pool().clone()));
         
-        let redis_service = if let Some(_) = self.redis_connection {
-            Some(Arc::new(SwingBuddy::services::redis::RedisService::new(self.settings.clone())?))
-        } else {
-            None
-        };
+        // Create shared Redis client
+        let redis_client = redis::Client::open(self.settings.redis.url.clone())?;
 
         // Create user repository
         let user_repository = SwingBuddy::database::repositories::UserRepository::new(self.db_pool().clone());
 
-        let user_service = Arc::new(SwingBuddy::services::user::UserService::new(
-            user_repository,
-            self.settings.clone(),
-        ));
-
         // Create bot for services that need it
         let bot = self.create_bot().await?;
 
-        let auth_service = Arc::new(SwingBuddy::services::auth::AuthService::new(
+        // Initialize all services
+        let user_service = SwingBuddy::services::user::UserService::new(
+            user_repository,
+            self.settings.clone(),
+        );
+
+        let auth_service = SwingBuddy::services::auth::AuthService::new(
             bot.clone(),
             self.settings.clone(),
-        ));
+        );
 
-        let notification_service = Arc::new(SwingBuddy::services::notification::NotificationService::new(
+        let notification_service = SwingBuddy::services::notification::NotificationService::new(
             bot.clone(),
             self.settings.clone(),
-        ));
+        );
 
-        // Create Redis client for CAS service
-        let redis_client = redis::Client::open(self.settings.redis.url.clone())?;
-        let cas_service = Arc::new(SwingBuddy::services::cas::CasService::new(
-            redis_client,
+        let cas_service = SwingBuddy::services::cas::CasService::new(
+            redis_client.clone(),
             self.settings.clone(),
-        )?);
+        )?;
 
-        let google_service = if self.settings.google.is_some() {
-            Some(Arc::new(SwingBuddy::services::google::GoogleService::new(
-                self.settings.google.as_ref().unwrap().clone(),
-            )))
-        } else {
-            None
-        };
-
-        let app_context = Arc::new(SwingBuddy::state::context::AppContext::new(
+        let redis_service = SwingBuddy::services::redis::RedisService::new(
             self.settings.clone(),
-            database_service,
-            redis_service,
+        )?;
+
+        let google_service = SwingBuddy::services::google::GoogleCalendarService::new(
+            self.settings.clone(),
+        )?;
+
+        // Create service factory
+        let service_factory = SwingBuddy::services::ServiceFactory {
             user_service,
             auth_service,
             notification_service,
             cas_service,
+            redis_service,
             google_service,
-        ));
+        };
+
+        // Create app context using factory (now async)
+        let app_context = Arc::new(SwingBuddy::state::context::AppContext::from_factory(
+            service_factory,
+            database_service,
+            self.settings.clone(),
+        ).await?);
 
         Ok(app_context)
     }
@@ -286,13 +288,13 @@ macro_rules! test_with_context {
             
             // Run the test body
             let test_fn = $test_body;
-            let fut = async move { test_fn(&ctx).await? };
-            fut.await
+            let result = test_fn(&ctx).await;
+            result?;
             
             // Cleanup
             ctx.cleanup().await?;
             
-            result
+            Ok(())
         }
     };
 }
@@ -314,13 +316,13 @@ macro_rules! test_with_custom_context {
             
             // Run the test body
             let test_fn = $test_body;
-            let fut = async move { test_fn(&ctx).await? };
-            fut.await
+            let result = test_fn(&ctx).await;
+            result?;
             
             // Cleanup
             ctx.cleanup().await?;
             
-            result
+            Ok(())
         }
     };
 }

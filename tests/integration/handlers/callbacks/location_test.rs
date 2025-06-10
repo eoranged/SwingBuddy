@@ -54,10 +54,10 @@ async fn test_location_selection_callback_onboarding() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     // Select language
@@ -65,10 +65,10 @@ async fn test_location_selection_callback_onboarding() {
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     // Provide name
@@ -76,10 +76,10 @@ async fn test_location_selection_callback_onboarding() {
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Test Moscow location selection
@@ -88,10 +88,10 @@ async fn test_location_selection_callback_onboarding() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Location selection callback should succeed: {:?}", result);
@@ -103,14 +103,14 @@ async fn test_location_selection_callback_onboarding() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            language_code,
-            location?,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -157,30 +157,30 @@ async fn test_saint_petersburg_location_selection() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:ru");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     let name_message = create_simple_test_message(user_id, chat_id, "Анна Петрова");
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Test Saint Petersburg location selection
@@ -189,10 +189,10 @@ async fn test_saint_petersburg_location_selection() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Saint Petersburg location selection should succeed: {:?}", result);
@@ -204,14 +204,14 @@ async fn test_saint_petersburg_location_selection() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            language_code,
-            location?,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -252,30 +252,30 @@ async fn test_location_skip_callback() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:en");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     let name_message = create_simple_test_message(user_id, chat_id, "Test User");
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Test location skip
@@ -284,10 +284,10 @@ async fn test_location_skip_callback() {
     let result = handle_callback_query(
         bot.clone(),
         skip_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     assert!(result.is_ok(), "Location skip callback should succeed: {:?}", result);
@@ -299,18 +299,14 @@ async fn test_location_skip_callback() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users
         WHERE telegram_id = $1
         "#,
@@ -358,30 +354,30 @@ async fn test_invalid_location_callback() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:en");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     let name_message = create_simple_test_message(user_id, chat_id, "Test User");
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Test various invalid location values
@@ -403,10 +399,10 @@ async fn test_invalid_location_callback() {
         let result = handle_callback_query(
             bot.clone(),
             location_callback,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // Should handle invalid location gracefully
@@ -453,10 +449,10 @@ async fn test_location_callback_no_context() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // Should handle gracefully (might return error or ignore)
@@ -506,10 +502,10 @@ async fn test_location_callback_wrong_step() {
     let result = handle_callback_query(
         bot.clone(),
         location_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await;
     
     // Should handle gracefully and not change the step
@@ -552,30 +548,30 @@ async fn test_concurrent_location_callbacks() {
         start::handle_start(
             bot.clone(),
             start_message,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await.expect("Start should succeed");
         
         let lang_callback = create_simple_test_callback_query(user_id, user_id, "lang:en");
         handle_callback_query(
             bot.clone(),
             lang_callback,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await.expect("Language selection should succeed");
         
         let name_message = create_simple_test_message(user_id, user_id, &format!("User {}", user_id));
         start::handle_name_input(
             bot.clone(),
             name_message,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await.expect("Name input should succeed");
     }
     
@@ -589,26 +585,26 @@ async fn test_concurrent_location_callbacks() {
         handle_callback_query(
             bot.clone(),
             location_callback1,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         handle_callback_query(
             bot.clone(),
             location_callback2,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ),
         handle_callback_query(
             bot.clone(),
             location_callback3,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         )
     );
     
@@ -623,14 +619,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            language_code,
-            location?,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user1_id
@@ -642,14 +638,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            language_code,
-            location?,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user2_id
@@ -660,14 +656,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username?,
-            first_name?,
-            last_name?,
-            language_code,
-            location?,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            COALESCE(language_code, 'en') as language_code,
+            location as "location?",
+            COALESCE(is_banned, false) as is_banned,
+            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
+            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user3_id
@@ -714,30 +710,30 @@ async fn test_malformed_location_callback_data() {
     start::handle_start(
         bot.clone(),
         start_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Start should succeed");
     
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:en");
     handle_callback_query(
         bot.clone(),
         lang_callback,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Language selection should succeed");
     
     let name_message = create_simple_test_message(user_id, chat_id, "Test User");
     start::handle_name_input(
         bot.clone(),
         name_message,
-        app_state.services.clone(),
-        app_state.scenario_manager.clone(),
-        app_state.state_storage.clone(),
-        app_state.i18n.clone(),
+        (*app_state.services).clone(),
+        (*app_state.scenario_manager).clone(),
+        (*app_state.state_storage).clone(),
+        (*app_state.i18n).clone(),
     ).await.expect("Name input should succeed");
     
     // Test malformed callback data
@@ -755,10 +751,10 @@ async fn test_malformed_location_callback_data() {
         let result = handle_callback_query(
             bot.clone(),
             callback,
-            app_state.services.clone(),
-            app_state.scenario_manager.clone(),
-            app_state.state_storage.clone(),
-            app_state.i18n.clone(),
+            (*app_state.services).clone(),
+            (*app_state.scenario_manager).clone(),
+            (*app_state.state_storage).clone(),
+            (*app_state.i18n).clone(),
         ).await;
         
         // Should handle malformed data gracefully

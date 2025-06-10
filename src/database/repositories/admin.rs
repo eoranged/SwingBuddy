@@ -6,6 +6,7 @@ use crate::models::admin::{AdminSettings, UserState, CasCheck, CreateAdminSettin
 use crate::utils::errors::SwingBuddyError;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct AdminRepository {
     pool: PgPool,
 }

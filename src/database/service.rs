@@ -6,7 +6,7 @@ use crate::database::{DatabasePool, UserRepository, GroupRepository, EventReposi
 use crate::models::*;
 use crate::utils::errors::SwingBuddyError;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DatabaseService {
     pub users: UserRepository,
     pub groups: GroupRepository,

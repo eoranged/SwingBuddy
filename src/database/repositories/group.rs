@@ -6,6 +6,7 @@ use crate::models::group::{Group, GroupMember, CreateGroupRequest, UpdateGroupRe
 use crate::utils::errors::SwingBuddyError;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct GroupRepository {
     pool: PgPool,
 }

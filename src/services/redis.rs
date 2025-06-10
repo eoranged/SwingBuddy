@@ -12,6 +12,7 @@ use crate::utils::errors::{SwingBuddyError, Result};
 
 /// Redis service for caching and state management
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct RedisService {
     client: Client,
     settings: Settings,

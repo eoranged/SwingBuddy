@@ -6,6 +6,7 @@ use crate::models::event::{Event, EventParticipant, CreateEventRequest, UpdateEv
 use crate::utils::errors::SwingBuddyError;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct EventRepository {
     pool: PgPool,
 }

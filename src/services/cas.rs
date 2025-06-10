@@ -39,6 +39,7 @@ pub struct CachedCasResult {
 
 /// CAS service for spam protection
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct CasService {
     client: Client,
     redis_client: redis::Client,

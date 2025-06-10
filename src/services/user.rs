@@ -12,6 +12,7 @@ use crate::utils::errors::{SwingBuddyError, Result};
 
 /// User service for managing user operations
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct UserService {
     user_repository: UserRepository,
     settings: Settings,
