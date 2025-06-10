@@ -65,7 +65,7 @@ mod tests {
         assert!(user_count.unwrap_or(0) > 0, "Test fixtures should be loaded");
         
         // Test mock server functionality
-        let bot = ctx.create_bot().await.expect("Failed to create bot");
+        let _bot = ctx.create_bot().await.expect("Failed to create bot");
         
         // Test that mock server responds
         ctx.verify_telegram_calls("sendMessage", 0).await; // Should start with 0 calls

@@ -20,7 +20,7 @@ pub async fn handle_start(
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -58,7 +58,7 @@ pub async fn handle_start(
             info!(user_id = user_id, "New user starting onboarding");
             
             // Create user in database first
-            let create_request = CreateUserRequest {
+            let _create_request = CreateUserRequest {
                 telegram_id: user_id,
                 username: user.username.clone(),
                 first_name: Some(user.first_name.clone()),
@@ -67,7 +67,7 @@ pub async fn handle_start(
                 location: None,
             };
             
-            let new_user = services.user_service.register_or_get_user(
+            let _new_user = services.user_service.register_or_get_user(
                 user_id,
                 user.username.clone(),
                 Some(user.first_name.clone()),
@@ -160,7 +160,7 @@ pub async fn handle_language_callback(
     info!(user_id = user_id, language_code = %language_code, "🔍 LANG HANDLER: Checking if language is supported");
     if !i18n.is_language_supported(&language_code) {
         warn!(user_id = user_id, language_code = %language_code, "🔍 LANG HANDLER: Unsupported language selected");
-        let error_text = i18n.t("messages.validation.invalid_name", "en", None);
+        let _error_text = i18n.t("messages.validation.invalid_name", "en", None);
         bot.send_message(chat_id, format!("❌ Unsupported language: {}", language_code)).await?;
         return Ok(());
     }
@@ -256,12 +256,12 @@ async fn ask_for_name(
 pub async fn handle_name_input(
     bot: Bot,
     msg: Message,
-    services: ServiceFactory,
+    _services: ServiceFactory,
     scenario_manager: ScenarioManager,
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
-    let user_id = msg.from().unwrap().id.0 as i64;
+    let user_id = msg.from.as_ref().unwrap().id.0 as i64;
     let chat_id = msg.chat.id;
     let name = msg.text().unwrap_or("").trim();
     
@@ -282,7 +282,7 @@ pub async fn handle_name_input(
     let language_code = context.get_string("language").unwrap_or_else(|| "en".to_string());
     
     // Validate name input
-    if let Err(e) = scenario_manager.validate_input(&context, name) {
+    if let Err(_e) = scenario_manager.validate_input(&context, name) {
         let error_text = i18n.t("messages.validation.invalid_name", &language_code, None);
         bot.send_message(chat_id, error_text).await?;
         return Ok(());
@@ -328,11 +328,11 @@ pub async fn handle_location_input(
     bot: Bot,
     msg: Message,
     services: ServiceFactory,
-    scenario_manager: ScenarioManager,
+    _scenario_manager: ScenarioManager,
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
-    let user_id = msg.from().unwrap().id.0 as i64;
+    let user_id = msg.from.as_ref().unwrap().id.0 as i64;
     let chat_id = msg.chat.id;
     let location = msg.text().unwrap_or("").trim();
     
@@ -368,7 +368,7 @@ pub async fn handle_location_callback(
     user_id: i64,
     location: String,
     services: ServiceFactory,
-    scenario_manager: ScenarioManager,
+    _scenario_manager: ScenarioManager,
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
@@ -452,7 +452,7 @@ pub async fn handle_language_selection(bot: Bot, msg: Message) -> Result<()> {
 
 /// Handle /profile command - show user profile
 pub async fn handle_profile(bot: Bot, msg: Message) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
     

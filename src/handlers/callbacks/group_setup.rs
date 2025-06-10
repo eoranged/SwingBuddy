@@ -70,7 +70,7 @@ pub async fn handle_bot_added_to_group(
 async fn check_bot_permissions(
     bot: Bot,
     chat_id: ChatId,
-    services: &ServiceFactory,
+    _services: &ServiceFactory,
     i18n: &I18n,
 ) -> Result<()> {
     debug!(chat_id = ?chat_id, "Checking bot permissions");

@@ -15,7 +15,7 @@ pub async fn handle_events_list(
     services: ServiceFactory,
     i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -48,7 +48,7 @@ pub async fn handle_events_list(
 async fn show_calendar_list(
     bot: Bot,
     chat_id: ChatId,
-    services: &ServiceFactory,
+    _services: &ServiceFactory,
     i18n: &I18n,
     language_code: &str,
 ) -> Result<()> {
@@ -152,7 +152,7 @@ async fn show_calendar_details(
     
     bot.send_message(chat_id, message_text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -165,7 +165,7 @@ pub async fn handle_create_event(
     services: ServiceFactory,
     i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -199,9 +199,9 @@ pub async fn handle_register(
     bot: Bot,
     msg: Message,
     services: ServiceFactory,
-    i18n: I18n,
+    _i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -211,7 +211,7 @@ pub async fn handle_register(
     debug!(user_id = user_id, "Processing event registration request");
 
     // Get user language
-    let user_lang = if let Some(user_data) = services.user_service.get_user_by_telegram_id(user_id).await? {
+    let _user_lang = if let Some(user_data) = services.user_service.get_user_by_telegram_id(user_id).await? {
         user_data.language_code
     } else {
         "en".to_string()
@@ -290,8 +290,8 @@ pub async fn show_event_details(
     bot: Bot,
     chat_id: ChatId,
     event: &Event,
-    user_id: i64,
-    services: &ServiceFactory,
+    _user_id: i64,
+    _services: &ServiceFactory,
     i18n: &I18n,
     language_code: &str,
 ) -> Result<()> {
@@ -328,7 +328,7 @@ pub async fn show_event_details(
     
     bot.send_message(chat_id, details_text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())

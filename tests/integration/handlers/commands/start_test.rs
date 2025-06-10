@@ -55,14 +55,14 @@ async fn test_start_command_new_user_private_chat() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -221,14 +221,14 @@ async fn test_start_command_existing_user() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -284,14 +284,14 @@ async fn test_start_command_with_deep_linking() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -334,7 +334,7 @@ async fn test_start_command_no_user_error() {
     let app_state = ctx.create_app_state().await.expect("Failed to create app state");
     
     // Create message without user (this is a synthetic test case)
-    let mut start_message = create_simple_test_message(123456793, 123456793, "/start");
+    let start_message = create_simple_test_message(123456793, 123456793, "/start");
     
     // Manually remove the user from the message to simulate the error condition
     // Note: This is a synthetic test case as Telegram always includes user info
@@ -369,7 +369,7 @@ async fn test_start_command_database_error() {
     let ctx = TestContext::new_with_config(config).await
         .expect("Failed to create test context");
     
-    let bot = ctx.create_bot().await.expect("Failed to create bot");
+    let _bot = ctx.create_bot().await.expect("Failed to create bot");
     
     // Try to create app state without database - this should fail gracefully
     // In a real scenario, we'd test with a database connection that fails
@@ -378,7 +378,7 @@ async fn test_start_command_database_error() {
     let user_id = 123456794i64;
     let chat_id = user_id;
     
-    let start_message = create_simple_test_message(user_id, chat_id, "/start");
+    let _start_message = create_simple_test_message(user_id, chat_id, "/start");
     
     // Since we don't have a database, we can't create the full app state
     // This test verifies that the system fails gracefully when dependencies are missing
@@ -434,14 +434,14 @@ async fn test_start_command_different_languages() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id_ru

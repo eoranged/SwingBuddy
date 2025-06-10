@@ -17,7 +17,7 @@ pub async fn handle_admin_panel(
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -100,8 +100,8 @@ pub async fn handle_admin_callback(
     user_id: i64,
     action: String,
     services: ServiceFactory,
-    scenario_manager: ScenarioManager,
-    state_storage: StateStorage,
+    _scenario_manager: ScenarioManager,
+    _state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
     debug!(user_id = user_id, action = %action, "Admin panel action");
@@ -174,7 +174,7 @@ async fn show_user_management(
     
     bot.send_message(chat_id, text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -184,7 +184,7 @@ async fn show_user_management(
 async fn show_group_management(
     bot: Bot,
     chat_id: ChatId,
-    services: &ServiceFactory,
+    _services: &ServiceFactory,
     i18n: &I18n,
     language_code: &str,
 ) -> Result<()> {
@@ -214,7 +214,7 @@ async fn show_group_management(
     
     bot.send_message(chat_id, text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -224,7 +224,7 @@ async fn show_group_management(
 async fn show_event_management(
     bot: Bot,
     chat_id: ChatId,
-    services: &ServiceFactory,
+    _services: &ServiceFactory,
     i18n: &I18n,
     language_code: &str,
 ) -> Result<()> {
@@ -260,7 +260,7 @@ async fn show_event_management(
     
     bot.send_message(chat_id, text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -310,7 +310,7 @@ async fn show_statistics(
     
     bot.send_message(chat_id, text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -320,7 +320,7 @@ async fn show_statistics(
 async fn show_system_settings(
     bot: Bot,
     chat_id: ChatId,
-    services: &ServiceFactory,
+    _services: &ServiceFactory,
     i18n: &I18n,
     language_code: &str,
 ) -> Result<()> {
@@ -350,7 +350,7 @@ async fn show_system_settings(
     
     bot.send_message(chat_id, text)
         .reply_markup(keyboard)
-        .parse_mode(teloxide::types::ParseMode::Markdown)
+        .parse_mode(teloxide::types::ParseMode::MarkdownV2)
         .await?;
     
     Ok(())
@@ -363,7 +363,7 @@ pub async fn handle_stats(
     services: ServiceFactory,
     i18n: I18n,
 ) -> Result<()> {
-    let user = msg.from().ok_or_else(|| {
+    let user = msg.from.as_ref().ok_or_else(|| {
         crate::utils::errors::SwingBuddyError::InvalidInput("No user in message".to_string())
     })?;
 
@@ -399,7 +399,7 @@ pub async fn handle_calendar_management(
     user_id: i64,
     action: String,
     services: ServiceFactory,
-    i18n: I18n,
+    _i18n: I18n,
 ) -> Result<()> {
     debug!(user_id = user_id, action = %action, "Calendar management action");
 
@@ -409,7 +409,7 @@ pub async fn handle_calendar_management(
     }
 
     // Get user language
-    let user_lang = if let Some(user_data) = services.user_service.get_user_by_telegram_id(user_id).await? {
+    let _user_lang = if let Some(user_data) = services.user_service.get_user_by_telegram_id(user_id).await? {
         user_data.language_code
     } else {
         "en".to_string()
@@ -419,14 +419,14 @@ pub async fn handle_calendar_management(
         "add" => {
             let text = "➕ **Add New Calendar**\n\nTo add a new calendar, please provide:\n• Calendar name\n• Description\n• Google Calendar ID (optional)";
             bot.send_message(chat_id, text)
-                .parse_mode(teloxide::types::ParseMode::Markdown)
+                .parse_mode(teloxide::types::ParseMode::MarkdownV2)
                 .await?;
         }
         "edit" => {
             let text = "✏️ **Edit Calendar**\n\nSelect a calendar to edit from the list below:";
             // TODO: Show list of existing calendars
             bot.send_message(chat_id, text)
-                .parse_mode(teloxide::types::ParseMode::Markdown)
+                .parse_mode(teloxide::types::ParseMode::MarkdownV2)
                 .await?;
         }
         _ => {

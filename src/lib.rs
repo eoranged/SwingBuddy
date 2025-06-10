@@ -4,6 +4,8 @@
 //! This library provides modular components for user management, event organization,
 //! group administration, and community moderation with multi-language support.
 
+#![allow(non_snake_case)]
+
 pub mod config;
 pub mod handlers;
 pub mod services;

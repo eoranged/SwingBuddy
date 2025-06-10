@@ -13,6 +13,7 @@ use crate::utils::errors::{SwingBuddyError, Result};
 #[derive(Clone)]
 pub struct AuthMiddleware {
     admin_ids: HashSet<i64>,
+    #[allow(dead_code)]
     settings: Settings,
 }
 

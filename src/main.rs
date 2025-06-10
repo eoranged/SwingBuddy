@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Initialize Redis connection
     info!("Connecting to Redis...");
-    let redis_service = RedisService::new(settings.clone())?;
+    let _redis_service = RedisService::new(settings.clone())?;
     
     // Initialize database service
     let database_service = DatabaseService::new(db_pool);

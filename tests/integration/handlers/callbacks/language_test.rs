@@ -292,7 +292,7 @@ async fn test_language_callback_no_context() {
     // Try language selection without context
     let lang_callback = create_simple_test_callback_query(user_id, chat_id, "lang:en");
     
-    let result = handle_callback_query(
+    let _result = handle_callback_query(
         bot.clone(),
         lang_callback,
         (*app_state.services).clone(),

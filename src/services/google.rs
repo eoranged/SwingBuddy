@@ -48,6 +48,7 @@ pub struct GoogleAttendee {
 #[derive(Debug)]
 pub struct GoogleCalendarService {
     settings: Settings,
+    #[allow(dead_code)]
     http_client: reqwest::Client,
 }
 

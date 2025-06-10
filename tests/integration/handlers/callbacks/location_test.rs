@@ -103,14 +103,14 @@ async fn test_location_selection_callback_onboarding() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -204,14 +204,14 @@ async fn test_saint_petersburg_location_selection() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -299,14 +299,14 @@ async fn test_location_skip_callback() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users
         WHERE telegram_id = $1
         "#,
@@ -512,7 +512,7 @@ async fn test_location_callback_wrong_step() {
     assert!(result.is_ok(), "Location callback in wrong step should be handled gracefully");
     
     // Verify step didn't change inappropriately
-    let context_after = app_state.state_storage.load_context(user_id).await
+    let _context_after = app_state.state_storage.load_context(user_id).await
         .expect("Failed to load context")
         .expect("Context should exist");
     
@@ -619,14 +619,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user1_id
@@ -638,14 +638,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user2_id
@@ -656,14 +656,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            COALESCE(language_code, 'en') as language_code,
-            location as "location?",
-            COALESCE(is_banned, false) as is_banned,
-            COALESCE(created_at, CURRENT_TIMESTAMP) as created_at,
-            COALESCE(updated_at, CURRENT_TIMESTAMP) as updated_at
+            username,
+            first_name,
+            last_name,
+            language_code,
+            location,
+            is_banned,
+            created_at,
+            updated_at
         FROM users WHERE telegram_id = $1
         "#,
         user3_id
