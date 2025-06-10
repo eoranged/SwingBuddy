@@ -158,7 +158,6 @@ mod tests {
     fn test_permission_validation() {
         let mut settings = Settings::default();
         settings.bot.admin_ids = vec![123];
-        settings.features.user_event_creation = false;
         
         let auth = AuthMiddleware::new(settings);
         

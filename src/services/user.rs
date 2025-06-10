@@ -293,8 +293,8 @@ impl Default for UpdateUserRequest {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_normalize_location() {
+    #[tokio::test]
+    async fn test_normalize_location() {
         let settings = Settings::default();
         let user_repo = UserRepository::new(sqlx::PgPool::connect("postgresql://test").await.unwrap());
         let service = UserService::new(user_repo, settings);
@@ -308,8 +308,8 @@ mod tests {
         assert_eq!(service.normalize_location("other city"), "Other city");
     }
 
-    #[test]
-    fn test_get_city_suggestions() {
+    #[tokio::test]
+    async fn test_get_city_suggestions() {
         let settings = Settings::default();
         let user_repo = UserRepository::new(sqlx::PgPool::connect("postgresql://test").await.unwrap());
         let service = UserService::new(user_repo, settings);

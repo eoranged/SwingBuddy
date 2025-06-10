@@ -1,0 +1,41 @@
+# SwingBuddy Telegram Bot Test Configuration
+# This configuration is used specifically for testing
+
+[bot]
+token = "12345:test_token"
+webhook_url = ""  # Use polling for tests
+admin_ids = [555666777]  # Test admin ID
+
+[database]
+url = "postgresql://test_user:test_password@localhost:5432/test_swingbuddy"
+max_connections = 5
+min_connections = 1
+
+[redis]
+url = "redis://localhost:6379"
+prefix = "test_swingbuddy:"
+ttl_seconds = 300  # Shorter TTL for tests
+
+[google]
+service_account_path = "/tmp/test-service-account.json"
+calendar_id = "test-calendar@group.calendar.google.com"
+
+[cas]
+api_url = "http://localhost:8080/cas"  # Will be overridden by mock server
+timeout_seconds = 1
+auto_ban = false  # Disabled for tests
+
+[i18n]
+default_language = "en"
+supported_languages = ["en", "ru"]
+
+[logging]
+level = "debug"
+file_path = "/tmp/swingbuddy_test.log"
+max_file_size = "1MB"
+max_files = 2
+
+[features]
+cas_protection = false  # Disabled for tests to avoid external API calls
+google_calendar = false  # Disabled for tests unless specifically needed
+admin_panel = true

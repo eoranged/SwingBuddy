@@ -71,6 +71,14 @@ url = "2.5"
 
 [dev-dependencies]
 tokio-test = "0.4"
+wiremock = "0.6"
+testcontainers = "0.23"
+testcontainers-modules = { version = "0.11", features = ["postgres"] }
+serial_test = "3.0"
+tempfile = "3.8"
+assert_matches = "1.5"
+proptest = "1.4"
+fake = { version = "2.9", features = ["derive", "chrono"] }
 
 [features]
 default = []
