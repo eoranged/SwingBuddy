@@ -13,8 +13,12 @@ pub fn init_logging(config: &LoggingConfig) -> Result<()> {
     let file_appender = tracing_appender::rolling::daily(&config.file_path, "swingbuddy.log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
     
+    // Use RUST_LOG environment variable if set, otherwise use config level
+    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&config.level));
+    
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new(&config.level))
+        .with(env_filter)
         .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
         .with(tracing_subscriber::fmt::layer().with_writer(non_blocking))
         .init();

@@ -35,7 +35,19 @@ impl StateStorage {
     /// Save conversation context to Redis
     pub async fn save_context(&self, context: &ConversationContext) -> Result<()> {
         let key = self.get_context_key(context.user_id);
-        let serialized = serde_json::to_string(context)?;
+        debug!(user_id = context.user_id, key = %key, scenario = ?context.scenario,
+               step = ?context.step, "Saving context to Redis");
+        
+        let serialized = match serde_json::to_string(context) {
+            Ok(data) => {
+                debug!(user_id = context.user_id, data_length = data.len(), "Context serialized successfully");
+                data
+            },
+            Err(e) => {
+                error!(user_id = context.user_id, error = %e, "Failed to serialize context");
+                return Err(e.into());
+            }
+        };
         
         let mut conn = self.connection_manager.clone();
         
@@ -48,35 +60,64 @@ impl StateStorage {
             self.config.ttl_seconds
         };
 
-        conn.set_ex::<_, _, ()>(&key, serialized, ttl_seconds).await?;
-        
-        debug!("Saved context for user {} with TTL {}s", context.user_id, ttl_seconds);
-        Ok(())
+        match conn.set_ex::<_, _, ()>(&key, serialized, ttl_seconds).await {
+            Ok(_) => {
+                debug!(user_id = context.user_id, ttl_seconds = ttl_seconds, "Context saved to Redis successfully");
+                Ok(())
+            },
+            Err(e) => {
+                error!(user_id = context.user_id, error = %e, "Failed to save context to Redis");
+                Err(e.into())
+            }
+        }
     }
 
     /// Load conversation context from Redis
     pub async fn load_context(&self, user_id: i64) -> Result<Option<ConversationContext>> {
         let key = self.get_context_key(user_id);
+        debug!(user_id = user_id, key = %key, "Loading context from Redis");
+        
         let mut conn = self.connection_manager.clone();
         
-        let serialized: Option<String> = conn.get(&key).await?;
+        let serialized: Option<String> = match conn.get::<&str, Option<String>>(&key).await {
+            Ok(data) => {
+                debug!(user_id = user_id, has_data = data.is_some(), "Redis GET result");
+                data
+            },
+            Err(e) => {
+                error!(user_id = user_id, error = %e, "Failed to get context from Redis");
+                return Err(e.into());
+            }
+        };
         
         match serialized {
             Some(data) => {
-                let mut context: ConversationContext = serde_json::from_str(&data)?;
+                debug!(user_id = user_id, data_length = data.len(), "Deserializing context data");
+                let context: ConversationContext = match serde_json::from_str::<ConversationContext>(&data) {
+                    Ok(ctx) => {
+                        debug!(user_id = user_id, scenario = ?ctx.scenario, step = ?ctx.step,
+                               "Context deserialized successfully");
+                        ctx
+                    },
+                    Err(e) => {
+                        error!(user_id = user_id, error = %e, "Failed to deserialize context");
+                        return Err(e.into());
+                    }
+                };
                 
                 // Check if context has expired
                 if context.is_expired() {
-                    warn!("Context for user {} has expired, removing", user_id);
+                    warn!(user_id = user_id, expires_at = ?context.expires_at, "Context has expired, removing");
                     self.delete_context(user_id).await?;
                     return Ok(None);
                 }
                 
-                debug!("Loaded context for user {}", user_id);
+                debug!(user_id = user_id, scenario = ?context.scenario, step = ?context.step,
+                       "Context loaded successfully");
                 Ok(Some(context))
             }
             None => {
-                debug!("No context found for user {}", user_id);
+                debug!(user_id = user_id, "No context found in Redis");
                 Ok(None)
             }
         }

@@ -65,50 +65,62 @@ impl UserService {
     }
 
     /// Update user profile
-    pub async fn update_user_profile(&self, user_id: i64, update_request: UpdateUserRequest) -> Result<User> {
-        debug!(user_id = user_id, "Updating user profile");
+    pub async fn update_user_profile(&self, telegram_id: i64, update_request: UpdateUserRequest) -> Result<User> {
+        debug!(telegram_id = telegram_id, "Updating user profile");
         
-        let user = self.user_repository.update(user_id, update_request).await?;
-        info!(user_id = user_id, "User profile updated successfully");
+        // First get the user by telegram_id to get the internal user_id
+        let existing_user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or_else(|| SwingBuddyError::UserNotFound { user_id: telegram_id })?;
+        
+        let user = self.user_repository.update(existing_user.id, update_request).await?;
+        info!(telegram_id = telegram_id, user_id = existing_user.id, "User profile updated successfully");
         
         Ok(user)
     }
 
     /// Set user language preference
-    pub async fn set_language_preference(&self, user_id: i64, language_code: String) -> Result<User> {
-        debug!(user_id = user_id, language_code = %language_code, "Setting user language preference");
+    pub async fn set_language_preference(&self, telegram_id: i64, language_code: String) -> Result<User> {
+        debug!(telegram_id = telegram_id, language_code = %language_code, "Setting user language preference");
 
         // Validate language code
         if !self.settings.i18n.supported_languages.contains(&language_code) {
-            warn!(user_id = user_id, language_code = %language_code, "Unsupported language code");
+            warn!(telegram_id = telegram_id, language_code = %language_code, "Unsupported language code");
             return Err(SwingBuddyError::InvalidInput(format!("Unsupported language: {}", language_code)));
         }
+
+        // First get the user by telegram_id to get the internal user_id
+        let existing_user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or_else(|| SwingBuddyError::UserNotFound { user_id: telegram_id })?;
 
         let update_request = UpdateUserRequest {
             language_code: Some(language_code.clone()),
             ..Default::default()
         };
 
-        let user = self.user_repository.update(user_id, update_request).await?;
-        info!(user_id = user_id, language_code = %language_code, "User language preference updated");
+        let user = self.user_repository.update(existing_user.id, update_request).await?;
+        info!(telegram_id = telegram_id, user_id = existing_user.id, language_code = %language_code, "User language preference updated");
         
         Ok(user)
     }
 
     /// Set user location with city suggestions
-    pub async fn set_user_location(&self, user_id: i64, location: String) -> Result<User> {
-        debug!(user_id = user_id, location = %location, "Setting user location");
+    pub async fn set_user_location(&self, telegram_id: i64, location: String) -> Result<User> {
+        debug!(telegram_id = telegram_id, location = %location, "Setting user location");
 
         // Normalize location (basic city suggestions for Moscow and Saint Petersburg)
         let normalized_location = self.normalize_location(&location);
+
+        // First get the user by telegram_id to get the internal user_id
+        let existing_user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or_else(|| SwingBuddyError::UserNotFound { user_id: telegram_id })?;
 
         let update_request = UpdateUserRequest {
             location: Some(normalized_location.clone()),
             ..Default::default()
         };
 
-        let user = self.user_repository.update(user_id, update_request).await?;
-        info!(user_id = user_id, location = %normalized_location, "User location updated");
+        let user = self.user_repository.update(existing_user.id, update_request).await?;
+        info!(telegram_id = telegram_id, user_id = existing_user.id, location = %normalized_location, "User location updated");
         
         Ok(user)
     }
@@ -137,22 +149,26 @@ impl UserService {
     }
 
     /// Check if user needs onboarding
-    pub async fn needs_onboarding(&self, user_id: i64) -> Result<bool> {
-        debug!(user_id = user_id, "Checking if user needs onboarding");
+    pub async fn needs_onboarding(&self, telegram_id: i64) -> Result<bool> {
+        debug!(telegram_id = telegram_id, "Checking if user needs onboarding");
 
-        let user = self.user_repository.find_by_id(user_id).await?
-            .ok_or(SwingBuddyError::UserNotFound { user_id })?;
+        let user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or(SwingBuddyError::UserNotFound { user_id: telegram_id })?;
 
         // User needs onboarding if they don't have a location set
         let needs_onboarding = user.location.is_none();
         
-        debug!(user_id = user_id, needs_onboarding = needs_onboarding, "Onboarding check completed");
+        debug!(telegram_id = telegram_id, user_id = user.id, needs_onboarding = needs_onboarding, "Onboarding check completed");
         Ok(needs_onboarding)
     }
 
     /// Complete user onboarding
-    pub async fn complete_onboarding(&self, user_id: i64, language_code: Option<String>, location: Option<String>) -> Result<User> {
-        info!(user_id = user_id, "Completing user onboarding");
+    pub async fn complete_onboarding(&self, telegram_id: i64, language_code: Option<String>, location: Option<String>) -> Result<User> {
+        info!(telegram_id = telegram_id, "Completing user onboarding");
+
+        // First get the user by telegram_id to get the internal user_id
+        let existing_user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or_else(|| SwingBuddyError::UserNotFound { user_id: telegram_id })?;
 
         let mut update_request = UpdateUserRequest::default();
 
@@ -166,22 +182,26 @@ impl UserService {
             update_request.location = Some(self.normalize_location(&loc));
         }
 
-        let user = self.user_repository.update(user_id, update_request).await?;
-        info!(user_id = user_id, "User onboarding completed successfully");
+        let user = self.user_repository.update(existing_user.id, update_request).await?;
+        info!(telegram_id = telegram_id, user_id = existing_user.id, "User onboarding completed successfully");
         
         Ok(user)
     }
 
     /// Ban or unban user
-    pub async fn set_user_ban_status(&self, user_id: i64, is_banned: bool, admin_id: i64) -> Result<User> {
-        info!(user_id = user_id, is_banned = is_banned, admin_id = admin_id, "Setting user ban status");
+    pub async fn set_user_ban_status(&self, telegram_id: i64, is_banned: bool, admin_id: i64) -> Result<User> {
+        info!(telegram_id = telegram_id, is_banned = is_banned, admin_id = admin_id, "Setting user ban status");
 
-        let user = self.user_repository.set_ban_status(user_id, is_banned).await?;
+        // First get the user by telegram_id to get the internal user_id
+        let existing_user = self.user_repository.find_by_telegram_id(telegram_id).await?
+            .ok_or_else(|| SwingBuddyError::UserNotFound { user_id: telegram_id })?;
+
+        let user = self.user_repository.set_ban_status(existing_user.id, is_banned).await?;
         
         if is_banned {
-            warn!(user_id = user_id, admin_id = admin_id, "User banned");
+            warn!(telegram_id = telegram_id, user_id = existing_user.id, admin_id = admin_id, "User banned");
         } else {
-            info!(user_id = user_id, admin_id = admin_id, "User unbanned");
+            info!(telegram_id = telegram_id, user_id = existing_user.id, admin_id = admin_id, "User unbanned");
         }
         
         Ok(user)

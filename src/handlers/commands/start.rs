@@ -4,7 +4,7 @@
 
 use std::collections::HashMap;
 use teloxide::{Bot, types::{Message, InlineKeyboardMarkup, InlineKeyboardButton, ChatId}, prelude::*};
-use tracing::{info, debug, warn};
+use tracing::{info, debug, warn, error};
 use crate::utils::errors::Result;
 use crate::services::{UserService, ServiceFactory};
 use crate::state::{ScenarioManager, StateStorage, ConversationContext};
@@ -75,11 +75,33 @@ pub async fn handle_start(
             ).await?;
             
             // Start onboarding scenario
+            info!(user_id = user_id, "🔍 START HANDLER: Starting onboarding scenario for new user");
             let mut context = ConversationContext::new(user_id);
-            scenario_manager.start_scenario(&mut context, "onboarding")?;
-            state_storage.save_context(&context).await?;
+            
+            match scenario_manager.start_scenario(&mut context, "onboarding") {
+                Ok(_) => {
+                    info!(user_id = user_id, scenario = ?context.scenario, step = ?context.step,
+                           "🔍 START HANDLER: Onboarding scenario started successfully");
+                },
+                Err(e) => {
+                    error!(user_id = user_id, error = %e, "🔍 START HANDLER: Failed to start onboarding scenario");
+                    return Err(e);
+                }
+            }
+            
+            info!(user_id = user_id, "🔍 START HANDLER: Attempting to save context to storage");
+            match state_storage.save_context(&context).await {
+                Ok(_) => {
+                    info!(user_id = user_id, "🔍 START HANDLER: Context saved successfully after starting onboarding");
+                },
+                Err(e) => {
+                    error!(user_id = user_id, error = %e, "🔍 START HANDLER: Failed to save context after starting onboarding - this could be the issue!");
+                    return Err(e);
+                }
+            }
             
             // Show language selection
+            info!(user_id = user_id, "🔍 START HANDLER: Showing language selection to user");
             show_language_selection(bot, chat_id, &i18n).await?;
         }
     }
@@ -89,9 +111,12 @@ pub async fn handle_start(
 
 /// Show language selection keyboard
 async fn show_language_selection(bot: Bot, chat_id: ChatId, i18n: &I18n) -> Result<()> {
+    info!(chat_id = ?chat_id, "🔍 LANG SELECTION: Creating language selection keyboard");
+    
     let welcome_text = i18n.t("commands.start.new_user_greeting", "en", None);
     let choose_lang_text = i18n.t("commands.start.choose_language", "en", None);
     
+    info!("🔍 LANG SELECTION: Creating keyboard buttons with callback data");
     let keyboard = InlineKeyboardMarkup::new(vec![
         vec![
             InlineKeyboardButton::callback(
@@ -105,12 +130,16 @@ async fn show_language_selection(bot: Bot, chat_id: ChatId, i18n: &I18n) -> Resu
         ]
     ]);
     
+    info!("🔍 LANG SELECTION: Buttons created - English: 'lang:en', Russian: 'lang:ru'");
+    
     let full_text = format!("{}\n\n{}", welcome_text, choose_lang_text);
     
+    info!(chat_id = ?chat_id, "🔍 LANG SELECTION: Sending message with keyboard");
     bot.send_message(chat_id, full_text)
         .reply_markup(keyboard)
         .await?;
     
+    info!(chat_id = ?chat_id, "🔍 LANG SELECTION: Language selection message sent successfully");
     Ok(())
 }
 
@@ -125,20 +154,54 @@ pub async fn handle_language_callback(
     state_storage: StateStorage,
     i18n: I18n,
 ) -> Result<()> {
-    debug!(user_id = user_id, language_code = %language_code, "User selected language");
+    info!(user_id = user_id, language_code = %language_code, "🔍 LANG HANDLER: User selected language - starting callback handler");
     
-    // Load user context
-    let mut context = state_storage.load_context(user_id).await?
-        .ok_or_else(|| crate::utils::errors::SwingBuddyError::InvalidStateTransition {
-            from: "no_context".to_string(),
-            to: "language_selected".to_string(),
-        })?;
-    
-    // Validate we're in the right scenario and step
-    if !context.is_at("onboarding", "language_selection") {
-        warn!(user_id = user_id, "User not in language selection step");
+    // Check if language is supported
+    info!(user_id = user_id, language_code = %language_code, "🔍 LANG HANDLER: Checking if language is supported");
+    if !i18n.is_language_supported(&language_code) {
+        warn!(user_id = user_id, language_code = %language_code, "🔍 LANG HANDLER: Unsupported language selected");
+        let error_text = i18n.t("messages.validation.invalid_name", "en", None);
+        bot.send_message(chat_id, format!("❌ Unsupported language: {}", language_code)).await?;
         return Ok(());
     }
+    
+    info!(user_id = user_id, "🔍 LANG HANDLER: Language is supported, loading user context");
+    
+    // Load user context
+    let context_result = state_storage.load_context(user_id).await;
+    info!(user_id = user_id, context_loaded = context_result.is_ok(), "🔍 LANG HANDLER: Context load result");
+    
+    let mut context = match context_result {
+        Ok(Some(ctx)) => {
+            info!(user_id = user_id, scenario = ?ctx.scenario, step = ?ctx.step, "🔍 LANG HANDLER: Context loaded successfully");
+            ctx
+        },
+        Ok(None) => {
+            error!(user_id = user_id, "🔍 LANG HANDLER: No context found for user - this is the likely issue!");
+            return Err(crate::utils::errors::SwingBuddyError::InvalidStateTransition {
+                from: "no_context".to_string(),
+                to: "language_selected".to_string(),
+            });
+        },
+        Err(e) => {
+            error!(user_id = user_id, error = %e, "🔍 LANG HANDLER: Failed to load context - this could be the issue!");
+            return Err(e);
+        }
+    };
+    
+    // Validate we're in the right scenario and step
+    let is_correct_state = context.is_at("onboarding", "language_selection");
+    info!(user_id = user_id, is_correct_state = is_correct_state,
+           current_scenario = ?context.scenario, current_step = ?context.step,
+           "🔍 LANG HANDLER: State validation result");
+    
+    if !is_correct_state {
+        error!(user_id = user_id, scenario = ?context.scenario, step = ?context.step,
+              "🔍 LANG HANDLER: User not in language selection step - this could be the issue!");
+        return Ok(());
+    }
+    
+    info!(user_id = user_id, "🔍 LANG HANDLER: All validations passed, proceeding with language update");
     
     // Update user language preference
     services.user_service.set_language_preference(user_id, language_code.clone()).await?;

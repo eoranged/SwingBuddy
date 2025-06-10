@@ -135,7 +135,11 @@ impl I18n {
 
     /// Check if a language is supported
     pub fn is_language_supported(&self, lang: &str) -> bool {
-        self.supported_languages.contains(&lang.to_string())
+        let is_supported = self.supported_languages.contains(&lang.to_string());
+        let has_translations = self.translations.contains_key(lang);
+        debug!(language = %lang, is_supported = is_supported, has_translations = has_translations,
+               supported_languages = ?self.supported_languages, "Language support check");
+        is_supported && has_translations
     }
 
     /// Get the effective language (fallback to default if not supported)

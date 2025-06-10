@@ -6,7 +6,7 @@ use std::sync::Arc;
 use teloxide::{prelude::*, types::Update};
 use teloxide::dispatching::UpdateHandler;
 use teloxide::utils::command::BotCommands as TeloxideBotCommands;
-use tracing::{info, error};
+use tracing::{info, warn, error};
 
 use SwingBuddy::{
     config::Settings,
@@ -83,13 +83,33 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     info!("Setting up bot handlers...");
     
-    // Create the handler
-    let handler = create_handler(services, scenario_manager, state_storage, i18n);
+    // Debug: Log service factory creation
+    info!("ServiceFactory created successfully");
     
-    // Create dispatcher
+    // Wrap services in Arc for dependency injection
+    let services_arc = Arc::new(services);
+    let scenario_manager_arc = Arc::new(scenario_manager);
+    let state_storage_arc = Arc::new(state_storage);
+    let i18n_arc = Arc::new(i18n);
+    
+    // Create the handler
+    let handler = create_handler();
+    
+    // Create dispatcher with dependencies registered
     let mut dispatcher = Dispatcher::builder(bot.clone(), handler)
+        .dependencies(dptree::deps![
+            services_arc,
+            scenario_manager_arc,
+            state_storage_arc,
+            i18n_arc
+        ])
+        .default_handler(|upd| async move {
+            warn!("Unhandled update: {:?}", upd);
+        })
         .enable_ctrlc_handler()
         .build();
+    
+    info!("Dispatcher created with dependencies registered in DI system");
     
     info!("SwingBuddy bot is ready!");
     
@@ -100,6 +120,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     info!("Starting bot with polling mode...");
+    
+    // Configure allowed update types to include callback queries
+    use teloxide::types::AllowedUpdate;
+    use teloxide::requests::Requester;
+    use url::Url;
+    
+    
     dispatcher.dispatch().await;
     
     info!("SwingBuddy bot has been shut down.");
@@ -108,20 +135,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Create the main update handler
-fn create_handler(
-    services: ServiceFactory,
-    scenario_manager: ScenarioManager,
-    state_storage: StateStorage,
-    i18n: I18n,
-) -> UpdateHandler<Box<dyn std::error::Error + Send + Sync + 'static>> {
+fn create_handler() -> UpdateHandler<Box<dyn std::error::Error + Send + Sync + 'static>> {
     use teloxide::dispatching::UpdateFilterExt;
     
-    let services = Arc::new(services);
-    let scenario_manager = Arc::new(scenario_manager);
-    let state_storage = Arc::new(state_storage);
-    let i18n = Arc::new(i18n);
-    
-    Update::filter_message()
+    dptree::entry()
+    .branch(Update::filter_message()
         .branch(
             // Handle commands
             dptree::entry()
@@ -137,16 +155,17 @@ fn create_handler(
             // Handle regular messages
             dptree::endpoint(handle_messages)
         )
-        .chain(
-            // Handle callback queries
+  
+    )
+    .branch(// Handle callback queries
             Update::filter_callback_query()
                 .endpoint(handle_callbacks)
-        )
-        .chain(
+    )
+    .branch(
             // Handle my chat member updates (bot added/removed from groups)
             Update::filter_my_chat_member()
                 .endpoint(handle_chat_member_updates)
-        )
+    )
 }
 
 #[derive(TeloxideBotCommands, Clone)]
@@ -252,16 +271,21 @@ async fn handle_callbacks(
     state_storage: Arc<StateStorage>,
     i18n: Arc<I18n>,
 ) -> HandlerResult {
+    let user_id = query.from.id.0 as i64;
+    info!(user_id = user_id, callback_data = ?query.data, "🔍 MAIN DISPATCHER: Callback query received in main handler");
+    
     let services = (*services).clone();
     let scenario_manager = (*scenario_manager).clone();
     let state_storage = (*state_storage).clone();
     let i18n = (*i18n).clone();
     
+    info!(user_id = user_id, "🔍 MAIN DISPATCHER: Dispatching to callback handler");
     if let Err(e) = handle_callback_query(bot, query, services, scenario_manager, state_storage, i18n).await {
-        error!(error = %e, "Error handling callback query");
+        error!(user_id = user_id, error = %e, "🔍 MAIN DISPATCHER: Error handling callback query");
         return Err(e.into());
     }
     
+    info!(user_id = user_id, "🔍 MAIN DISPATCHER: Callback query handled successfully");
     Ok(())
 }
 

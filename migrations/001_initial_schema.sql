@@ -11,8 +11,8 @@ CREATE TABLE users (
     language_code VARCHAR(10) DEFAULT 'en',
     location VARCHAR(255),
     is_banned BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Groups table
@@ -24,8 +24,8 @@ CREATE TABLE groups (
     language_code VARCHAR(10) DEFAULT 'en',
     settings JSONB DEFAULT '{}',
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Group members table
@@ -34,7 +34,7 @@ CREATE TABLE group_members (
     group_id BIGINT REFERENCES groups(id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     role VARCHAR(50) DEFAULT 'member',
-    joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(group_id, user_id)
 );
 
@@ -50,8 +50,8 @@ CREATE TABLE events (
     created_by BIGINT REFERENCES users(id),
     group_id BIGINT REFERENCES groups(id),
     is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Event participants table
@@ -60,7 +60,7 @@ CREATE TABLE event_participants (
     event_id BIGINT REFERENCES events(id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     status VARCHAR(50) DEFAULT 'registered',
-    registered_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(event_id, user_id)
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE admin_settings (
     key VARCHAR(255) UNIQUE NOT NULL,
     value JSONB NOT NULL,
     updated_by BIGINT REFERENCES users(id),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- User states table (for conversation context)
@@ -80,7 +80,7 @@ CREATE TABLE user_states (
     step VARCHAR(100),
     data JSONB DEFAULT '{}',
     expires_at TIMESTAMP WITH TIME ZONE,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CAS check logs table
@@ -90,7 +90,7 @@ CREATE TABLE cas_checks (
     telegram_id BIGINT NOT NULL,
     is_banned BOOLEAN NOT NULL,
     ban_reason TEXT,
-    checked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    checked_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes for performance
@@ -113,4 +113,3 @@ CREATE INDEX idx_cas_checks_date ON cas_checks(checked_at);
 CREATE INDEX idx_users_banned ON users(is_banned);
 CREATE INDEX idx_groups_active ON groups(is_active);
 CREATE INDEX idx_events_active ON events(is_active);
-CREATE INDEX idx_events_upcoming ON events(event_date) WHERE is_active = true AND event_date > NOW();

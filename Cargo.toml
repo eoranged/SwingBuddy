@@ -53,6 +53,7 @@ dotenv = "0.15"
 
 # Async utilities
 futures = "0.3"
+async-stream = "0.3"
 
 # Rate limiting
 governor = "0.6"
