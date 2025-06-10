@@ -1,0 +1,41 @@
+# SwingBuddy Telegram Bot Configuration
+# Copy this file to config.toml and fill in your values
+
+[bot]
+token = "YOUR_BOT_TOKEN_HERE"
+webhook_url = "https://your-domain.com/webhook"  # Optional, leave empty for polling
+admin_ids = [123456789, 987654321]  # Replace with actual admin Telegram IDs
+
+[database]
+url = "postgresql://user:password@localhost/swingbuddy"
+max_connections = 10
+min_connections = 1
+
+[redis]
+url = "redis://localhost:6379"
+prefix = "swingbuddy:"
+ttl_seconds = 3600
+
+[google]
+service_account_path = "/path/to/service-account.json"
+calendar_id = "your-calendar-id@group.calendar.google.com"
+
+[cas]
+api_url = "https://api.cas.chat"
+timeout_seconds = 5
+auto_ban = true
+
+[i18n]
+default_language = "en"
+supported_languages = ["en", "ru"]
+
+[logging]
+level = "info"
+file_path = "/var/log/swingbuddy.log"
+max_file_size = "10MB"
+max_files = 5
+
+[features]
+cas_protection = true
+google_calendar = true
+admin_panel = true

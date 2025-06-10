@@ -1,0 +1,198 @@
+{
+  "commands": {
+    "start": {
+      "welcome": "Welcome to SwingBuddy! 💃🕺",
+      "choose_language": "Please choose your language:",
+      "new_user_greeting": "Hello! I'm SwingBuddy, your swing dancing community assistant. Let's get you set up!",
+      "returning_user": "Welcome back, {name}! How can I help you today?",
+      "language_selected": "Great! I'll communicate with you in English from now on.",
+      "ask_name": "What's your name? (This will help me personalize our conversations)",
+      "ask_location": "What's your location? (This helps me show you relevant local events)",
+      "setup_complete": "Perfect! Your setup is complete. You can now:\n\n• Browse upcoming swing dance events\n• Register for events\n• Get notifications about new events\n• Connect with other dancers\n\nType /help to see all available commands!"
+    },
+    "help": {
+      "title": "SwingBuddy Help 📚",
+      "description": "Here are the commands you can use:",
+      "user_commands": "👤 User Commands:",
+      "event_commands": "🎭 Event Commands:",
+      "admin_commands": "👑 Admin Commands (Admins only):",
+      "general_help": "For more help, contact the administrators or check our community guidelines."
+    },
+    "events": {
+      "list_title": "Upcoming Swing Dance Events 🎭",
+      "no_events": "No upcoming events found. Check back later!",
+      "event_details": "📅 **{title}**\n📍 Location: {location}\n🕒 Date: {date}\n👥 Participants: {current}/{max}\n\n{description}",
+      "register_success": "✅ Successfully registered for **{event_name}**!",
+      "register_error": "❌ Failed to register for the event. Please try again.",
+      "already_registered": "ℹ️ You're already registered for this event.",
+      "event_full": "😔 Sorry, this event is already full.",
+      "unregister_success": "✅ Successfully unregistered from **{event_name}**.",
+      "unregister_error": "❌ Failed to unregister from the event.",
+      "not_registered": "ℹ️ You're not registered for this event.",
+      "create_title": "Create New Event",
+      "create_success": "✅ Event **{event_name}** created successfully!",
+      "create_error": "❌ Failed to create event. Please try again.",
+      "edit_success": "✅ Event updated successfully!",
+      "delete_success": "✅ Event deleted successfully!",
+      "delete_confirm": "Are you sure you want to delete the event **{event_name}**? This action cannot be undone."
+    },
+    "admin": {
+      "panel_title": "Admin Panel 👑",
+      "access_denied": "❌ Access denied. You don't have admin privileges.",
+      "user_management": "👥 User Management",
+      "group_management": "👥 Group Management", 
+      "event_management": "🎭 Event Management",
+      "system_settings": "⚙️ System Settings",
+      "statistics": "📊 Statistics",
+      "ban_user_success": "✅ User {user_name} has been banned.",
+      "unban_user_success": "✅ User {user_name} has been unbanned.",
+      "user_not_found": "❌ User not found.",
+      "broadcast_sent": "✅ Broadcast message sent to {count} users.",
+      "broadcast_error": "❌ Failed to send broadcast message.",
+      "settings_updated": "✅ Settings updated successfully!",
+      "backup_created": "✅ Database backup created successfully!",
+      "backup_error": "❌ Failed to create database backup."
+    }
+  },
+  "buttons": {
+    "language": {
+      "english": "🇺🇸 English",
+      "russian": "🇷🇺 Русский"
+    },
+    "events": {
+      "register": "✅ Register",
+      "unregister": "❌ Unregister", 
+      "details": "📋 Details",
+      "list": "📋 Event List",
+      "create": "➕ Create Event",
+      "edit": "✏️ Edit",
+      "delete": "🗑️ Delete"
+    },
+    "admin": {
+      "users": "👥 Users",
+      "groups": "👥 Groups",
+      "events": "🎭 Events",
+      "settings": "⚙️ Settings",
+      "statistics": "📊 Stats",
+      "broadcast": "📢 Broadcast",
+      "ban": "🚫 Ban",
+      "unban": "✅ Unban",
+      "backup": "💾 Backup"
+    },
+    "navigation": {
+      "back": "⬅️ Back",
+      "cancel": "❌ Cancel",
+      "confirm": "✅ Confirm",
+      "next": "➡️ Next",
+      "previous": "⬅️ Previous",
+      "home": "🏠 Home"
+    }
+  },
+  "messages": {
+    "group": {
+      "welcome": "Hello! I'm SwingBuddy, ready to help manage your swing dance community! 💃🕺",
+      "setup_required": "To get started, I need some permissions. Please make me an administrator with the following permissions:\n\n• Delete messages\n• Ban users\n• Pin messages\n• Manage group info",
+      "setup_complete": "✅ Great! I'm all set up and ready to help manage your group.",
+      "permission_check": "Checking my permissions...",
+      "insufficient_permissions": "❌ I don't have sufficient permissions. Please make me an admin with the required permissions.",
+      "cas_protection_enabled": "🛡️ CAS spam protection is now enabled for this group.",
+      "cas_protection_disabled": "🛡️ CAS spam protection is now disabled for this group.",
+      "user_banned_cas": "🚫 User {user_name} has been banned due to CAS detection.",
+      "welcome_new_member": "Welcome to our swing dance community, {user_name}! 💃🕺"
+    },
+    "validation": {
+      "invalid_name": "❌ Please enter a valid name (2-50 characters, letters and spaces only).",
+      "invalid_location": "❌ Please enter a valid location (2-100 characters).",
+      "invalid_date": "❌ Please enter a valid date in the future.",
+      "invalid_time": "❌ Please enter a valid time (HH:MM format).",
+      "invalid_number": "❌ Please enter a valid number.",
+      "required_field": "❌ This field is required.",
+      "too_long": "❌ Text is too long (maximum {max} characters).",
+      "too_short": "❌ Text is too short (minimum {min} characters)."
+    },
+    "errors": {
+      "generic": "❌ Something went wrong. Please try again later.",
+      "network": "❌ Network error. Please check your connection and try again.",
+      "permission_denied": "❌ You don't have permission to perform this action.",
+      "rate_limit": "❌ Too many requests. Please wait a moment and try again.",
+      "maintenance": "🔧 The bot is currently under maintenance. Please try again later.",
+      "database": "❌ Database error. Please contact the administrators.",
+      "timeout": "⏰ Request timed out. Please try again.",
+      "invalid_command": "❌ Invalid command. Type /help to see available commands.",
+      "user_banned": "🚫 You have been banned from using this bot.",
+      "group_inactive": "❌ This group is not active. Contact an administrator."
+    },
+    "success": {
+      "operation_completed": "✅ Operation completed successfully!",
+      "data_saved": "✅ Data saved successfully!",
+      "settings_applied": "✅ Settings applied successfully!",
+      "notification_sent": "✅ Notification sent successfully!"
+    },
+    "info": {
+      "processing": "⏳ Processing your request...",
+      "loading": "⏳ Loading...",
+      "please_wait": "⏳ Please wait...",
+      "operation_in_progress": "⏳ Operation in progress...",
+      "data_updated": "ℹ️ Data has been updated.",
+      "no_changes": "ℹ️ No changes were made.",
+      "feature_coming_soon": "🚧 This feature is coming soon!",
+      "beta_feature": "🧪 This is a beta feature. Please report any issues."
+    }
+  },
+  "notifications": {
+    "event_reminder": "🔔 Reminder: **{event_name}** starts in {time}!\n📍 Location: {location}",
+    "event_cancelled": "❌ Event **{event_name}** has been cancelled.",
+    "event_updated": "📝 Event **{event_name}** has been updated. Check the details!",
+    "new_event": "🎉 New event available: **{event_name}**\n📅 {date}\n📍 {location}",
+    "registration_confirmed": "✅ Your registration for **{event_name}** is confirmed!",
+    "registration_cancelled": "❌ Your registration for **{event_name}** has been cancelled.",
+    "event_full": "😔 **{event_name}** is now full. You've been added to the waiting list.",
+    "spot_available": "🎉 A spot is now available for **{event_name}**! Register quickly!"
+  },
+  "plurals": {
+    "participants": {
+      "one": "{count} participant",
+      "other": "{count} participants"
+    },
+    "events": {
+      "one": "{count} event",
+      "other": "{count} events"
+    },
+    "users": {
+      "one": "{count} user",
+      "other": "{count} users"
+    },
+    "groups": {
+      "one": "{count} group", 
+      "other": "{count} groups"
+    },
+    "minutes": {
+      "one": "{count} minute",
+      "other": "{count} minutes"
+    },
+    "hours": {
+      "one": "{count} hour",
+      "other": "{count} hours"
+    },
+    "days": {
+      "one": "{count} day",
+      "other": "{count} days"
+    }
+  },
+  "calendar": {
+    "months": [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ],
+    "days": [
+      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+    ],
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "this_week": "This week",
+    "next_week": "Next week",
+    "this_month": "This month",
+    "next_month": "Next month"
+  }
+}
