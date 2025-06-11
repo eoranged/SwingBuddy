@@ -153,11 +153,11 @@ pub async fn verify_user_profile(
             username as "username?",
             first_name as "first_name?",
             last_name as "last_name?",
-            language_code,
+            language_code as "language_code!",
             location as "location?",
-            is_banned,
-            created_at,
-            updated_at
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id

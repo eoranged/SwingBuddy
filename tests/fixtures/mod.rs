@@ -4,9 +4,7 @@
 //! and database seeding utilities for complex test scenarios.
 
 use std::collections::HashMap;
-use SwingBuddy::models::user::{User as DbUser, CreateUserRequest};
-use SwingBuddy::models::event::{Event, CreateEventRequest};
-use SwingBuddy::models::group::{Group, CreateGroupRequest};
+// Remove unused imports - these types are not used in fixtures
 use chrono::{DateTime, Utc, Duration};
 
 /// Test user fixtures
@@ -315,15 +313,14 @@ pub async fn load_test_fixtures(
     for group in fixtures.groups.all_groups() {
         let group_result = sqlx::query!(
             r#"
-            INSERT INTO groups (telegram_id, title, description, is_active, created_by, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+            INSERT INTO groups (telegram_id, title, description, is_active, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, NOW(), NOW())
             ON CONFLICT (telegram_id) DO NOTHING
             "#,
             group.telegram_id,
             group.title,
             group.description,
-            group.is_active,
-            group.created_by
+            group.is_active
         )
         .execute(pool)
         .await;
@@ -365,7 +362,7 @@ pub async fn cleanup_test_fixtures(pool: &sqlx::PgPool) -> Result<(), sqlx::Erro
         .execute(pool)
         .await?;
     
-    sqlx::query!("DELETE FROM groups WHERE created_by IN (100001, 100002, 555666777, 100004)")
+    sqlx::query!("DELETE FROM groups WHERE telegram_id IN (-1001234567890, -1001234567891, -1001234567892)")
         .execute(pool)
         .await?;
     

@@ -7,9 +7,9 @@ use teloxide::types::{
     Message, User, Chat, ChatKind, MessageKind, MessageCommon, CallbackQuery, 
     InlineKeyboardButton, InlineKeyboardMarkup, UserId, ChatId, MessageId,
     ChatPrivate, ChatPublic, PublicChatKind, PublicChatSupergroup,
-    MediaKind, MediaText, LinkPreviewOptions
+    MediaKind, MediaText
 };
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 
 /// Helper function to create a test Telegram user
 pub fn create_test_user(

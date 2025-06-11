@@ -4,9 +4,8 @@
 //! for testing purposes. It uses wiremock to create configurable mock responses.
 
 use serde_json::{json, Value};
-use std::collections::HashMap;
 use wiremock::{
-    matchers::{method, path, query_param},
+    matchers::{method, path},
     Mock, MockServer, ResponseTemplate,
 };
 
@@ -38,18 +37,24 @@ impl TelegramMockServer {
     /// Create a new mock Telegram API server
     pub async fn new() -> Self {
         let server = MockServer::start().await;
-        let base_url = format!("{}/bot{{token}}", server.uri());
+        let base_url = server.uri();
         
         Self { server, base_url }
     }
 
     /// Get the mock server URL for a given bot token
-    pub fn get_api_url(&self, token: &str) -> String {
-        self.base_url.replace("{token}", token)
+    pub fn get_api_url(&self, _token: &str) -> String {
+        // Return just the base URL - teloxide will append /bot{token} automatically
+        self.base_url.clone()
     }
 
     /// Setup mock for sendMessage endpoint
     pub async fn mock_send_message(&self, config: MockResponseConfig) {
+        self.mock_send_message_with_token(&test_bot_token(), config).await;
+    }
+
+    /// Setup mock for sendMessage endpoint with specific token
+    pub async fn mock_send_message_with_token(&self, token: &str, config: MockResponseConfig) {
         let response_body = config.custom_response.unwrap_or_else(|| {
             if config.success {
                 json!({
@@ -87,8 +92,15 @@ impl TelegramMockServer {
             response = response.set_delay(std::time::Duration::from_millis(delay));
         }
 
+        // Use exact token path matching - support both cases
         Mock::given(method("POST"))
-            .and(path("/bot12345:test_token/sendMessage"))
+            .and(path(format!("/bot{}/sendMessage", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        Mock::given(method("POST"))
+            .and(path(format!("/bot{}/SendMessage", token)))
             .respond_with(response)
             .mount(&self.server)
             .await;
@@ -96,6 +108,11 @@ impl TelegramMockServer {
 
     /// Setup mock for editMessageText endpoint
     pub async fn mock_edit_message_text(&self, config: MockResponseConfig) {
+        self.mock_edit_message_text_with_token(&test_bot_token(), config).await;
+    }
+
+    /// Setup mock for editMessageText endpoint with specific token
+    pub async fn mock_edit_message_text_with_token(&self, token: &str, config: MockResponseConfig) {
         let response_body = config.custom_response.unwrap_or_else(|| {
             if config.success {
                 json!({
@@ -135,7 +152,13 @@ impl TelegramMockServer {
         }
 
         Mock::given(method("POST"))
-            .and(path("/bot12345:test_token/editMessageText"))
+            .and(path(format!("/bot{}/editMessageText", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        Mock::given(method("POST"))
+            .and(path(format!("/bot{}/EditMessageText", token)))
             .respond_with(response)
             .mount(&self.server)
             .await;
@@ -143,6 +166,11 @@ impl TelegramMockServer {
 
     /// Setup mock for answerCallbackQuery endpoint
     pub async fn mock_answer_callback_query(&self, config: MockResponseConfig) {
+        self.mock_answer_callback_query_with_token(&test_bot_token(), config).await;
+    }
+
+    /// Setup mock for answerCallbackQuery endpoint with specific token
+    pub async fn mock_answer_callback_query_with_token(&self, token: &str, config: MockResponseConfig) {
         let response_body = config.custom_response.unwrap_or_else(|| {
             if config.success {
                 json!({
@@ -166,7 +194,13 @@ impl TelegramMockServer {
         }
 
         Mock::given(method("POST"))
-            .and(path("/bot12345:test_token/answerCallbackQuery"))
+            .and(path(format!("/bot{}/answerCallbackQuery", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        Mock::given(method("POST"))
+            .and(path(format!("/bot{}/AnswerCallbackQuery", token)))
             .respond_with(response)
             .mount(&self.server)
             .await;
@@ -174,6 +208,11 @@ impl TelegramMockServer {
 
     /// Setup mock for getMe endpoint
     pub async fn mock_get_me(&self, config: MockResponseConfig) {
+        self.mock_get_me_with_token(&test_bot_token(), config).await;
+    }
+
+    /// Setup mock for getMe endpoint with specific token
+    pub async fn mock_get_me_with_token(&self, token: &str, config: MockResponseConfig) {
         let response_body = config.custom_response.unwrap_or_else(|| {
             if config.success {
                 json!({
@@ -205,7 +244,26 @@ impl TelegramMockServer {
         }
 
         Mock::given(method("POST"))
-            .and(path("/bot12345:test_token/getMe"))
+            .and(path(format!("/bot{}/getMe", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        Mock::given(method("POST"))
+            .and(path(format!("/bot{}/GetMe", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        // Also support GET method for getMe
+        Mock::given(method("GET"))
+            .and(path(format!("/bot{}/getMe", token)))
+            .respond_with(response.clone())
+            .mount(&self.server)
+            .await;
+            
+        Mock::given(method("GET"))
+            .and(path(format!("/bot{}/GetMe", token)))
             .respond_with(response)
             .mount(&self.server)
             .await;
@@ -213,40 +271,55 @@ impl TelegramMockServer {
 
     /// Setup all common mocks with default success responses
     pub async fn setup_default_mocks(&self) {
+        self.setup_default_mocks_with_token(&test_bot_token()).await;
+    }
+
+    /// Setup all common mocks with default success responses for specific token
+    pub async fn setup_default_mocks_with_token(&self, token: &str) {
         let config = MockResponseConfig::default();
         
-        self.mock_send_message(config.clone()).await;
-        self.mock_edit_message_text(config.clone()).await;
-        self.mock_answer_callback_query(config.clone()).await;
-        self.mock_get_me(config).await;
+        self.mock_send_message_with_token(token, config.clone()).await;
+        self.mock_edit_message_text_with_token(token, config.clone()).await;
+        self.mock_answer_callback_query_with_token(token, config.clone()).await;
+        self.mock_get_me_with_token(token, config).await;
     }
 
     /// Setup mocks for error scenarios
     pub async fn setup_error_mocks(&self) {
+        self.setup_error_mocks_with_token(&test_bot_token()).await;
+    }
+
+    /// Setup mocks for error scenarios with specific token
+    pub async fn setup_error_mocks_with_token(&self, token: &str) {
         let config = MockResponseConfig {
             success: false,
             delay_ms: None,
             custom_response: None,
         };
         
-        self.mock_send_message(config.clone()).await;
-        self.mock_edit_message_text(config.clone()).await;
-        self.mock_answer_callback_query(config.clone()).await;
-        self.mock_get_me(config).await;
+        self.mock_send_message_with_token(token, config.clone()).await;
+        self.mock_edit_message_text_with_token(token, config.clone()).await;
+        self.mock_answer_callback_query_with_token(token, config.clone()).await;
+        self.mock_get_me_with_token(token, config).await;
     }
 
     /// Setup mocks with timeout simulation
     pub async fn setup_timeout_mocks(&self, delay_ms: u64) {
+        self.setup_timeout_mocks_with_token(&test_bot_token(), delay_ms).await;
+    }
+
+    /// Setup mocks with timeout simulation for specific token
+    pub async fn setup_timeout_mocks_with_token(&self, token: &str, delay_ms: u64) {
         let config = MockResponseConfig {
             success: true,
             delay_ms: Some(delay_ms),
             custom_response: None,
         };
         
-        self.mock_send_message(config.clone()).await;
-        self.mock_edit_message_text(config.clone()).await;
-        self.mock_answer_callback_query(config.clone()).await;
-        self.mock_get_me(config).await;
+        self.mock_send_message_with_token(token, config.clone()).await;
+        self.mock_edit_message_text_with_token(token, config.clone()).await;
+        self.mock_answer_callback_query_with_token(token, config.clone()).await;
+        self.mock_get_me_with_token(token, config).await;
     }
 
     /// Reset all mocks
@@ -259,15 +332,25 @@ impl TelegramMockServer {
         // This would require additional wiremock verification features
         // For now, we'll implement basic verification through request counting
         let received_requests = self.server.received_requests().await.unwrap();
+        
         let matching_requests = received_requests
             .iter()
-            .filter(|req| req.url.path().contains(endpoint))
+            .filter(|req| {
+                let path = req.url.path();
+                // Check if the path contains the endpoint (case-insensitive)
+                path.to_lowercase().contains(&endpoint.to_lowercase()) ||
+                // Also check for exact endpoint match at the end of path
+                path.ends_with(&format!("/{}", endpoint)) ||
+                path.ends_with(&format!("/{}", endpoint.to_lowercase())) ||
+                path.ends_with(&format!("/{}", endpoint.chars().next().unwrap().to_uppercase().collect::<String>() + &endpoint[1..]))
+            })
             .count();
         
         assert_eq!(
             matching_requests, times,
-            "Expected {} calls to {}, but got {}",
-            times, endpoint, matching_requests
+            "Expected {} calls to {}, but got {}. Received requests: {:?}",
+            times, endpoint, matching_requests,
+            received_requests.iter().map(|r| format!("{} {}", r.method, r.url.path())).collect::<Vec<_>>()
         );
     }
 }
@@ -295,7 +378,7 @@ mod tests {
     async fn test_telegram_mock_server_creation() {
         let mock_server = TelegramMockServer::new().await;
         assert!(!mock_server.base_url.is_empty());
-        assert!(mock_server.base_url.contains("bot{token}"));
+        assert!(mock_server.base_url.starts_with("http://"));
     }
 
     #[tokio::test]
@@ -303,8 +386,9 @@ mod tests {
         let mock_server = TelegramMockServer::new().await;
         let token = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11";
         let api_url = mock_server.get_api_url(token);
-        assert!(api_url.contains(token));
-        assert!(!api_url.contains("{token}"));
+        // The API URL should now be just the base URL (teloxide handles the token path)
+        assert_eq!(api_url, mock_server.base_url);
+        assert!(api_url.starts_with("http://"));
     }
 
     #[tokio::test]

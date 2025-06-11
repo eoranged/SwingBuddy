@@ -5,7 +5,7 @@
 
 use sqlx::{PgPool, Postgres, Transaction};
 use std::sync::Once;
-use testcontainers::{core::WaitFor, runners::AsyncRunner, ContainerAsync, Image, ImageExt};
+use testcontainers::{runners::AsyncRunner, ContainerAsync};
 use testcontainers_modules::postgres::Postgres as PostgresImage;
 use uuid::Uuid;
 use SwingBuddy::models::user::User;
@@ -37,19 +37,8 @@ impl TestDatabase {
         let database_url = if let Ok(url) = std::env::var("TEST_DATABASE_URL") {
             url
         } else {
-            // Use testcontainers for local development
-            let postgres_image = PostgresImage::default()
-                .with_db_name("test_swingbuddy")
-                .with_user("test_user")
-                .with_password("test_password");
-            
-            let container = postgres_image.start().await.expect("Failed to start postgres container");
-            let port = container.get_host_port_ipv4(5432).await.expect("Failed to get port");
-            
-            format!(
-                "postgresql://test_user:test_password@localhost:{}/test_swingbuddy",
-                port
-            )
+            // Use local PostgreSQL instance (no testcontainers)
+            "postgresql://test_user:test_password@localhost:5432/test_swingbuddy".to_string()
         };
 
         let pool = PgPool::connect(&database_url).await?;
@@ -102,12 +91,12 @@ impl TestDatabase {
 
     /// Clean all test data from the database
     pub async fn cleanup(&self) -> Result<(), sqlx::Error> {
-        // Delete in reverse order of dependencies
-        sqlx::query("DELETE FROM event_participants").execute(&self.pool).await?;
-        sqlx::query("DELETE FROM events").execute(&self.pool).await?;
-        sqlx::query("DELETE FROM group_members").execute(&self.pool).await?;
-        sqlx::query("DELETE FROM groups").execute(&self.pool).await?;
-        sqlx::query("DELETE FROM users").execute(&self.pool).await?;
+        // Delete in reverse order of dependencies with proper error handling
+        let _ = sqlx::query("DELETE FROM event_participants").execute(&self.pool).await;
+        let _ = sqlx::query("DELETE FROM events").execute(&self.pool).await;
+        let _ = sqlx::query("DELETE FROM group_members").execute(&self.pool).await;
+        let _ = sqlx::query("DELETE FROM groups").execute(&self.pool).await;
+        let _ = sqlx::query("DELETE FROM users").execute(&self.pool).await;
         
         Ok(())
     }
@@ -157,8 +146,8 @@ impl TestDatabase {
         // Insert group admins
         sqlx::query!(
             r#"
-            INSERT INTO group_members (group_id, user_id, is_admin)
-            SELECT g.id, u.id, true
+            INSERT INTO group_members (group_id, user_id, role)
+            SELECT g.id, u.id, 'admin'
             FROM groups g, users u
             WHERE g.telegram_id = -1001234567890 AND u.telegram_id = 555666777
             ON CONFLICT (group_id, user_id) DO NOTHING
@@ -204,11 +193,11 @@ impl TestDatabase {
                 username as "username?",
                 first_name as "first_name?",
                 last_name as "last_name?",
-                language_code,
+                language_code as "language_code!",
                 location as "location?",
-                is_banned,
-                created_at,
-                updated_at
+                is_banned as "is_banned!",
+                created_at as "created_at!",
+                updated_at as "updated_at!"
             FROM users WHERE telegram_id = $1
             "#,
             telegram_id
@@ -229,11 +218,11 @@ impl TestDatabase {
                 telegram_id,
                 title,
                 description as "description?",
-                language_code,
+                language_code as "language_code!",
                 settings,
-                is_active,
-                created_at,
-                updated_at
+                is_active as "is_active!",
+                created_at as "created_at!",
+                updated_at as "updated_at!"
             FROM groups WHERE telegram_id = $1
             "#,
             telegram_id
@@ -256,17 +245,21 @@ impl TestDatabase {
             r#"
             INSERT INTO users (telegram_id, username, first_name, language_code, created_at, updated_at)
             VALUES ($1, $2, $3, 'en', NOW(), NOW())
+            ON CONFLICT (telegram_id) DO UPDATE SET
+                username = EXCLUDED.username,
+                first_name = EXCLUDED.first_name,
+                updated_at = NOW()
             RETURNING
                 id,
                 telegram_id,
                 username as "username?",
                 first_name as "first_name?",
                 last_name as "last_name?",
-                language_code,
+                language_code as "language_code!",
                 location as "location?",
-                is_banned,
-                created_at,
-                updated_at
+                is_banned as "is_banned!",
+                created_at as "created_at!",
+                updated_at as "updated_at!"
             "#,
             telegram_id,
             username,
@@ -294,11 +287,11 @@ impl TestDatabase {
                 telegram_id,
                 title,
                 description as "description?",
-                language_code,
+                language_code as "language_code!",
                 settings,
-                is_active,
-                created_at,
-                updated_at
+                is_active as "is_active!",
+                created_at as "created_at!",
+                updated_at as "updated_at!"
             "#,
             telegram_id,
             title

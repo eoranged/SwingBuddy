@@ -12,22 +12,9 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-#[derive(Debug, FromRow, Serialize, Deserialize)]
-struct DbUser {
-    pub id: i64,
-    pub telegram_id: i64,
-    pub username: Option<String>,
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub language_code: String,
-    pub location: Option<String>,
-    pub is_banned: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
 use SwingBuddy::state::ConversationContext;
 
-use crate::helpers::{TestContext, TestConfig, create_simple_test_callback_query, create_simple_test_message};
+use crate::helpers::{TestContext, TestConfig, create_simple_test_callback_query, create_simple_test_message, DbUser};
 
 /// Test location selection callback during onboarding
 #[tokio::test]
@@ -103,14 +90,14 @@ async fn test_location_selection_callback_onboarding() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -204,14 +191,14 @@ async fn test_saint_petersburg_location_selection() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -299,14 +286,14 @@ async fn test_location_skip_callback() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users
         WHERE telegram_id = $1
         "#,
@@ -619,14 +606,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user1_id
@@ -638,14 +625,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user2_id
@@ -656,14 +643,14 @@ async fn test_concurrent_location_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user3_id

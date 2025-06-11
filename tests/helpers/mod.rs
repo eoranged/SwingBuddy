@@ -10,10 +10,10 @@ pub mod simple_test;
 pub mod test_data;
 
 pub use telegram_mock::*;
-pub use database_helper::*;
 pub use test_context::*;
-pub use simple_test::*;
-pub use test_data::*;
+pub use database_helper::TestDatabase;
+pub use simple_test::{SimpleTestContext, SimpleTestConfig};
+pub use test_data::{create_simple_test_message, create_test_message, create_test_private_chat, create_test_group_chat, create_simple_test_callback_query};
 
 pub type DbUser = SwingBuddy::models::user::User;
 

@@ -297,8 +297,12 @@ mod tests {
     #[tokio::test]
     async fn test_normalize_location() {
         let settings = Settings::default();
-        let user_repo = UserRepository::new(sqlx::PgPool::connect("postgresql://test").await.unwrap());
-        let service = UserService::new(user_repo, settings);
+        // Create a service instance without database connection for unit testing
+        // We only need to test the normalize_location business logic
+        let service = UserService {
+            user_repository: UserRepository::new_for_testing(),
+            settings,
+        };
 
         assert_eq!(service.normalize_location("moscow"), "Moscow");
         assert_eq!(service.normalize_location("МОСКВА"), "Moscow");
@@ -312,8 +316,11 @@ mod tests {
     #[tokio::test]
     async fn test_get_city_suggestions() {
         let settings = Settings::default();
-        let user_repo = UserRepository::new(sqlx::PgPool::connect("postgresql://test").await.unwrap());
-        let service = UserService::new(user_repo, settings);
+        // Create a service instance without database connection for unit testing
+        let service = UserService {
+            user_repository: UserRepository::new_for_testing(),
+            settings,
+        };
 
         let suggestions = service.get_city_suggestions("mos");
         assert!(suggestions.contains(&"Moscow".to_string()));

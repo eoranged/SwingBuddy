@@ -92,24 +92,35 @@ async fn test_custom_context_config() {
 }
 
 // Test using the helper macros
-test_with_context!(test_macro_usage, async |ctx: &TestContext| -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+#[tokio::test]
+#[serial]
+async fn test_macro_usage() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let ctx = TestContext::new().await?;
+    ctx.load_fixtures().await?;
+    
     // Test that the macro works correctly
     let user_count = ctx.database.count_records("users").await?;
     assert!(user_count > 0); // Fixtures should be loaded
     
+    ctx.cleanup().await?;
     Ok(())
-});
+}
 
-test_with_custom_context!(
-    test_custom_macro_usage,
-    (TestConfig {
+#[tokio::test]
+#[serial]
+async fn test_custom_macro_usage() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let config = TestConfig {
         use_database: true,
         use_redis: false,
         setup_default_mocks: true,
         bot_token: Some("macro_test_token".to_string()),
-    }),
-    async |ctx: &TestContext| -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        assert_eq!(ctx.bot_token, "macro_test_token");
-        Ok(())
-    }
-);
+    };
+    
+    let ctx = TestContext::new_with_config(config).await?;
+    ctx.load_fixtures().await?;
+    
+    assert_eq!(ctx.bot_token, "macro_test_token");
+    
+    ctx.cleanup().await?;
+    Ok(())
+}

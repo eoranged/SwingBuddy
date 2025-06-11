@@ -4,11 +4,8 @@
 //! including event listing, browsing, registration flow, and different user contexts.
 
 use serial_test::serial;
-use std::collections::HashMap;
-use teloxide::types::{Message, ChatId};
-use teloxide::Bot;
+use teloxide::types::ChatId;
 use SwingBuddy::handlers::commands::events;
-use SwingBuddy::models::user::{User as DbUser};
 
 use crate::helpers::{TestContext, TestConfig, create_simple_test_message, create_test_message};
 

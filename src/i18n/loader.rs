@@ -350,7 +350,17 @@ mod tests {
     #[test]
     fn test_language_detection() {
         let config = create_test_config();
-        let i18n = I18n::new(&config);
+        let mut i18n = I18n::new(&config);
+        
+        // Add mock translations to make languages "supported"
+        use serde_json::Map;
+        let mut en_translations = Map::new();
+        en_translations.insert("test".to_string(), serde_json::Value::String("test".to_string()));
+        let mut ru_translations = Map::new();
+        ru_translations.insert("test".to_string(), serde_json::Value::String("тест".to_string()));
+        
+        i18n.translations.insert("en".to_string(), en_translations);
+        i18n.translations.insert("ru".to_string(), ru_translations);
         
         assert_eq!(i18n.detect_user_language(Some("en-US")), "en");
         assert_eq!(i18n.detect_user_language(Some("ru")), "ru");

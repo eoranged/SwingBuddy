@@ -4,15 +4,10 @@
 //! including different contexts, deep linking, and error handling scenarios.
 
 use serial_test::serial;
-use std::collections::HashMap;
-use teloxide::types::{Message, User, Chat, ChatKind, MessageKind, MessageCommon, ChatId, UserId};
-use teloxide::Bot;
 use SwingBuddy::handlers::commands::start;
-use SwingBuddy::models::user::{User as DbUser, CreateUserRequest};
-use SwingBuddy::state::{ConversationContext, ScenarioManager};
-use SwingBuddy::utils::errors::SwingBuddyError;
+use SwingBuddy::models::user::User as DbUser;
 
-use crate::helpers::{TestContext, TestConfig, create_simple_test_message, create_test_message, create_test_private_chat, create_test_group_chat};
+use crate::helpers::{TestContext, TestConfig, create_simple_test_message, create_test_message};
 
 /// Test /start command in private chat for new user
 #[tokio::test]
@@ -55,14 +50,14 @@ async fn test_start_command_new_user_private_chat() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -221,14 +216,14 @@ async fn test_start_command_existing_user() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -284,14 +279,14 @@ async fn test_start_command_with_deep_linking() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -434,14 +429,14 @@ async fn test_start_command_different_languages() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            language_code,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id_ru

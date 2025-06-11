@@ -4,8 +4,6 @@
 //! including different contexts, language support, and message formatting.
 
 use serial_test::serial;
-use teloxide::types::{Message, ChatId};
-use teloxide::Bot;
 use SwingBuddy::handlers::commands::help;
 
 use crate::helpers::{TestContext, TestConfig, create_simple_test_message, create_test_message};

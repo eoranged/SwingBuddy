@@ -43,8 +43,12 @@ impl TestContext {
 
         // Initialize mock Telegram server
         let telegram_mock = TelegramMockServer::new().await;
+        
+        // Create test bot token first
+        let bot_token = config.bot_token.unwrap_or_else(|| "12345:test_token".to_string());
+        
         if config.setup_default_mocks {
-            telegram_mock.setup_default_mocks().await;
+            telegram_mock.setup_default_mocks_with_token(&bot_token).await;
         }
 
         // Initialize Redis connection (optional)
@@ -53,9 +57,6 @@ impl TestContext {
         } else {
             None
         };
-
-        // Create test bot token
-        let bot_token = config.bot_token.unwrap_or_else(|| "12345:test_token".to_string());
 
         // Create test settings
         let settings = Self::create_test_settings(&database, &telegram_mock, &bot_token, &temp_dir)?;
@@ -229,13 +230,13 @@ impl TestContext {
     pub async fn setup_telegram_mocks(&self, scenario: MockScenario) {
         match scenario {
             MockScenario::Success => {
-                self.telegram_mock.setup_default_mocks().await;
+                self.telegram_mock.setup_default_mocks_with_token(&self.bot_token).await;
             }
             MockScenario::Error => {
-                self.telegram_mock.setup_error_mocks().await;
+                self.telegram_mock.setup_error_mocks_with_token(&self.bot_token).await;
             }
             MockScenario::Timeout => {
-                self.telegram_mock.setup_timeout_mocks(5000).await;
+                self.telegram_mock.setup_timeout_mocks_with_token(&self.bot_token, 5000).await;
             }
         }
     }

@@ -4,8 +4,6 @@
 //! including language switching functionality and invalid callback handling.
 
 use serial_test::serial;
-use teloxide::types::{CallbackQuery, ChatId};
-use teloxide::Bot;
 use SwingBuddy::handlers::callbacks::handle_callback_query;
 use SwingBuddy::handlers::commands::start;
 use SwingBuddy::models::user::{User as DbUser};
@@ -67,20 +65,14 @@ async fn test_language_selection_callback_onboarding() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -162,20 +154,14 @@ async fn test_russian_language_selection_callback() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user_id
@@ -447,20 +433,14 @@ async fn test_concurrent_language_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user1_id
@@ -472,20 +452,14 @@ async fn test_concurrent_language_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user2_id
@@ -497,20 +471,14 @@ async fn test_concurrent_language_callbacks() {
         SELECT
             id,
             telegram_id,
-            username,
-            first_name,
-            last_name,
-            is_bot,
-            language_code,
-            is_premium,
-            added_to_attachment_menu,
-            can_join_groups,
-            can_read_all_group_messages,
-            supports_inline_queries,
-            location,
-            is_banned,
-            created_at,
-            updated_at
+            username as "username?",
+            first_name as "first_name?",
+            last_name as "last_name?",
+            language_code as "language_code!",
+            location as "location?",
+            is_banned as "is_banned!",
+            created_at as "created_at!",
+            updated_at as "updated_at!"
         FROM users WHERE telegram_id = $1
         "#,
         user3_id
