@@ -45,41 +45,14 @@ async fn verify_successful_onboarding(
     name: &str,
     location: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    use SwingBuddy::models::user::User as DbUser;
+    // First, run the complete onboarding flow
+    crate::integration::run_complete_user_journey(ctx, user_id, language, name, location).await?;
     
-    // Verify user was created with correct data
-    let user = sqlx::query_as!(
-        DbUser,
-        r#"
-        SELECT
-            id,
-            telegram_id,
-            username as "username?",
-            first_name as "first_name?",
-            last_name as "last_name?",
-            language_code as "language_code!",
-            location as "location?",
-            is_banned as "is_banned!",
-            created_at as "created_at!",
-            updated_at as "updated_at!"
-        FROM users WHERE telegram_id = $1
-        "#,
-        user_id
-    )
-    .fetch_one(ctx.db_pool())
-    .await?;
-    
-    assert_eq!(user.language_code, language);
-    assert_eq!(user.first_name.as_deref(), Some(name));
-    
-    if let Some(expected_location) = location {
-        assert_eq!(user.location.as_deref(), Some(expected_location));
-    } else {
-        assert!(user.location.is_none());
-    }
+    // Then verify the results
+    crate::integration::verify_user_profile(ctx, user_id, language, name, location).await?;
     
     // Verify onboarding state is cleared
-    super::ScenarioTestUtils::verify_scenario_completed(ctx, user_id).await?;
+    crate::integration::verify_onboarding_completed(ctx, user_id).await?;
     
     Ok(())
 }

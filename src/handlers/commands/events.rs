@@ -134,21 +134,32 @@ async fn show_calendar_details(
 
     let message_text = format!("**{}**\n\n{}", title, description);
     
-    // Create keyboard with "Add to Google Calendar" button
-    let keyboard = InlineKeyboardMarkup::new(vec![
-        vec![
-            InlineKeyboardButton::url(
-                "📅 Add to Google Calendar",
-                reqwest::Url::parse(&services.google_service.generate_calendar_sharing_url()?)?
-            ),
-        ],
-        vec![
-            InlineKeyboardButton::callback(
-                i18n.t("buttons.navigation.back", language_code, None),
-                "calendar:back"
-            ),
-        ],
+    // Create keyboard - only add Google Calendar button if feature is enabled
+    let mut keyboard_rows = vec![];
+    
+    // Check if Google Calendar integration is enabled
+    if services.google_service.is_enabled() {
+        if let Ok(calendar_url) = services.google_service.generate_calendar_sharing_url() {
+            if let Ok(parsed_url) = reqwest::Url::parse(&calendar_url) {
+                keyboard_rows.push(vec![
+                    InlineKeyboardButton::url(
+                        "📅 Add to Google Calendar",
+                        parsed_url
+                    ),
+                ]);
+            }
+        }
+    }
+    
+    // Always add back button
+    keyboard_rows.push(vec![
+        InlineKeyboardButton::callback(
+            i18n.t("buttons.navigation.back", language_code, None),
+            "calendar:back"
+        ),
     ]);
+    
+    let keyboard = InlineKeyboardMarkup::new(keyboard_rows);
     
     bot.send_message(chat_id, message_text)
         .reply_markup(keyboard)

@@ -82,18 +82,30 @@ pub async fn handle_callback_query(
             }
             "location" => {
                 // Location selection callback
+                info!(user_id = user_id, callback_data = %data, "🔍 LOCATION CALLBACK: Location callback received");
                 if parts.len() >= 2 {
                     let location = parts[1].to_string();
-                    start::handle_location_callback(
+                    info!(user_id = user_id, location = %location, "🔍 LOCATION CALLBACK: Dispatching to location handler");
+                    match start::handle_location_callback(
                         bot,
                         chat_id,
                         user_id,
-                        location,
+                        location.clone(),
                         services,
                         scenario_manager,
                         state_storage,
                         i18n,
-                    ).await?;
+                    ).await {
+                        Ok(_) => {
+                            info!(user_id = user_id, location = %location, "🔍 LOCATION CALLBACK: Location callback handled successfully");
+                        },
+                        Err(e) => {
+                            error!(user_id = user_id, location = %location, error = %e, "🔍 LOCATION CALLBACK: Location callback failed");
+                            return Err(e);
+                        }
+                    }
+                } else {
+                    warn!(user_id = user_id, callback_data = %data, "🔍 LOCATION CALLBACK: Invalid location callback format");
                 }
             }
             "calendar" => {

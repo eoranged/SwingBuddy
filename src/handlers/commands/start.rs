@@ -356,7 +356,7 @@ pub async fn handle_location_input(
     context.set_data("location", location)?;
     
     // Complete onboarding
-    complete_onboarding(bot, chat_id, user_id, context, services, i18n, language_code).await?;
+    complete_onboarding(bot, chat_id, user_id, context, services, state_storage, i18n, language_code).await?;
     
     Ok(())
 }
@@ -374,12 +374,35 @@ pub async fn handle_location_callback(
 ) -> Result<()> {
     debug!(user_id = user_id, location = %location, "User selected location");
     
-    // Load context
-    let mut context = state_storage.load_context(user_id).await?
-        .ok_or_else(|| crate::utils::errors::SwingBuddyError::InvalidStateTransition {
-            from: "no_context".to_string(),
-            to: "location_selected".to_string(),
-        })?;
+    // Load context with proper error handling
+    let context_result = state_storage.load_context(user_id).await;
+    let mut context = match context_result {
+        Ok(Some(ctx)) => {
+            debug!(user_id = user_id, scenario = ?ctx.scenario, step = ?ctx.step, "Context loaded successfully for location callback");
+            ctx
+        },
+        Ok(None) => {
+            warn!(user_id = user_id, "No context found for user during location callback - user may have completed onboarding already");
+            // Send a friendly message instead of erroring
+            let message = i18n.t("messages.errors.session_expired", "en", None);
+            bot.send_message(chat_id, message).await?;
+            return Ok(());
+        },
+        Err(e) => {
+            error!(user_id = user_id, error = %e, "Failed to load context for location callback");
+            let message = i18n.t("messages.errors.technical_error", "en", None);
+            bot.send_message(chat_id, message).await?;
+            return Ok(());
+        }
+    };
+    
+    // Validate we're in the correct scenario and step
+    if !context.is_at("onboarding", "location_input") {
+        warn!(user_id = user_id, scenario = ?context.scenario, step = ?context.step,
+              "User not in location_input step during location callback - ignoring");
+        // Don't error, just ignore the callback gracefully
+        return Ok(());
+    }
     
     let language_code = context.get_string("language").unwrap_or_else(|| "en".to_string());
     
@@ -389,7 +412,7 @@ pub async fn handle_location_callback(
     }
     
     // Complete onboarding
-    complete_onboarding(bot, chat_id, user_id, context, services, i18n, language_code).await?;
+    complete_onboarding(bot, chat_id, user_id, context, services, state_storage, i18n, language_code).await?;
     
     Ok(())
 }
@@ -401,12 +424,17 @@ async fn complete_onboarding(
     user_id: i64,
     mut context: ConversationContext,
     services: ServiceFactory,
+    state_storage: StateStorage,
     i18n: I18n,
     language_code: String,
 ) -> Result<()> {
+    info!(user_id = user_id, "🔍 COMPLETE ONBOARDING: Starting onboarding completion");
+    
     // Get data from context
     let name = context.get_string("name");
     let location = context.get_string("location");
+    
+    info!(user_id = user_id, name = ?name, location = ?location, "🔍 COMPLETE ONBOARDING: Retrieved context data");
     
     // Update user profile
     let mut update_request = crate::models::user::UpdateUserRequest::default();
@@ -418,17 +446,24 @@ async fn complete_onboarding(
     }
     update_request.language_code = Some(language_code.clone());
     
+    info!(user_id = user_id, "🔍 COMPLETE ONBOARDING: Updating user profile in database");
     services.user_service.update_user_profile(user_id, update_request).await?;
     
-    // Complete scenario
+    // Complete scenario and clear context from storage
+    info!(user_id = user_id, "🔍 COMPLETE ONBOARDING: Clearing user context from state storage");
     context.complete_scenario();
+    
+    // Delete the context from state storage to ensure it's completely cleared
+    state_storage.delete_context(user_id).await?;
+    
+    // Also clear from Redis service for redundancy
     services.redis_service.clear_user_state(user_id).await?;
     
     // Show completion message
     let completion_text = i18n.t("commands.start.setup_complete", &language_code, None);
     bot.send_message(chat_id, completion_text).await?;
     
-    info!(user_id = user_id, "User onboarding completed successfully");
+    info!(user_id = user_id, "🔍 COMPLETE ONBOARDING: User onboarding completed successfully");
     
     Ok(())
 }

@@ -120,7 +120,9 @@
       "timeout": "⏰ Request timed out. Please try again.",
       "invalid_command": "❌ Invalid command. Type /help to see available commands.",
       "user_banned": "🚫 You have been banned from using this bot.",
-      "group_inactive": "❌ This group is not active. Contact an administrator."
+      "group_inactive": "❌ This group is not active. Contact an administrator.",
+      "session_expired": "⏰ Your session has expired. Please start over with /start.",
+      "technical_error": "❌ A technical error occurred. Please try again later."
     },
     "success": {
       "operation_completed": "✅ Operation completed successfully!",
